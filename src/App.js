@@ -281,7 +281,7 @@ export default function App() {
           The Manager<br />
           INLAND CONTAINER DEPOT (ICD)<br />
           WHITE FIELD BANGALORE<br />
-          <strong sx={}>Date: {formatDate(form.doDate)}</strong>
+          <strong>Date: {formatDate(form.doDate)}</strong>
         </Typography>
 
         <Typography paragraph mt={2}>Dear Sir,</Typography>
