@@ -9,6 +9,7 @@ import {
   Paper
 } from "@mui/material";
 import html2pdf from "html2pdf.js";
+import logo from "./asset/logo.jpg";
 
 export default function App() {
   const [form, setForm] = useState({
@@ -255,9 +256,9 @@ export default function App() {
       </Paper>
 
       <Paper sx={{ p: 3 }} ref={previewRef}>
-        <Box textAlign="center" mb={2}>
+        <Box textAlign="" mb={2}>
           <img
-            src="https://via.placeholder.com/150x50.png?text=LOGO"
+            src={logo}
             alt="Logo"
             style={{ width: "150px", marginBottom: "10px" }}
           />
@@ -271,7 +272,7 @@ export default function App() {
           </Typography>
         </Box>
 
-        <Typography variant="h5" color="error" gutterBottom>
+        <Typography variant="h5" gutterBottom>
           DELIVERY ORDER
         </Typography>
 
@@ -280,7 +281,7 @@ export default function App() {
           The Manager<br />
           INLAND CONTAINER DEPOT (ICD)<br />
           WHITE FIELD BANGALORE<br />
-          <strong>Date: {formatDate(form.doDate)}</strong>
+          <strong sx={}>Date: {formatDate(form.doDate)}</strong>
         </Typography>
 
         <Typography paragraph mt={2}>Dear Sir,</Typography>
