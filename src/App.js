@@ -95,8 +95,8 @@ export default function App() {
 
   return (
     <Container sx={{ mt: 4, mb: 4, }}>
-      <Typography variant="h4" align="center" color="primary" gutterBottom>
-        Delivery Order
+      <Typography variant="h5" align="center" color="primary" gutterBottom>
+      SREE EXIM SOLUTIONS <br/> DELIVERY ORDER
       </Typography>
 
       <Paper sx={{ p: 3, mb: 4 }}>
@@ -185,14 +185,19 @@ export default function App() {
 
       <Paper sx={{ p: 4 }} ref={previewRef}>
         <Box display="flex" mb={2}>
-          <img src="/logo.jpeg" alt="Logo" style={{ width: "130px", marginRight: "10px" }} />
+          <img 
+          src={`${window.location.origin}/logo.jpeg`} 
+          alt="Logo" 
+          style={{ width: "100px", marginRight: "10px" }}
+          crossOrigin="anonymous"
+           />
           <Box>
             <Typography variant="h5">SREE EXIM SOLUTIONS</Typography>
             <Typography variant="body2">
-              ADD: NO. S1 SV YASHAS, 4TH FLOOR (LIFT 5TH), D SILVA LAYOUT,
-              WHITEFIELD, BANGALORE 560066 INDIA.
+              ADD: UNIT NO. T-2310 | BLOCK B 3RD FLOOR | ARDENTE OFFICE ONE HOODI MAIN RD 
+              BENGALURU 560048 INDIA.
               <br />
-              Phone: 080-41739105 | Email: sesblr@sreegroup.net | Website:
+              Phone: 080-4111 4344 | Email: sesblr@sreegroup.net | Website:
               https://www.sreegroup.net
             </Typography>
           </Box>
