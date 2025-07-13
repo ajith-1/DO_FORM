@@ -11,15 +11,7 @@ import {
 } from "@mui/material";
 import html2pdf from "html2pdf.js";
 import "./style.css";
-
-// ✅ Your logo as Base64
-const logoBase64 =
-  "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcU" +
-  "FhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoK" +
-  "CgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAyADIDASIAAhEBAxEB/8QAGwAAAwEBAQEBAAAAAAAAAAAAAQ" +
-  "UGAwQCBwj/xAA9EAABAwIEAwYEBQIGAwAAAAABAAIRAwQFEiExQQYTIlFhcRQygZGhsdHwQlJywdEUU2KSk+HxM1L/xAAXAQE" +
-  "BAQEAAAAAAAAAAAAAAAAAAgED/8QAGhEBAQEAAwEAAAAAAAAAAAAAAAERAhIhMf/aAAwDAQACEQMRAD8A9zREQBERAEREARE" +
-  "QBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQB//2Q==";
+// import logo from "../public/logo.jpeg";
 
 export default function App() {
   const [form, setForm] = useState({
@@ -102,7 +94,7 @@ export default function App() {
   ];
 
   return (
-    <Container sx={{ mt: 4, mb: 4 }}>
+    <Container sx={{ mt: 4, mb: 4, }}>
       <Typography variant="h4" align="center" color="primary" gutterBottom>
         Delivery Order
       </Typography>
@@ -193,7 +185,7 @@ export default function App() {
 
       <Paper sx={{ p: 4 }} ref={previewRef}>
         <Box display="flex" mb={2}>
-          <img src={logoBase64} alt="Logo" style={{ width: "130px", marginRight: "10px" }} />
+          <img src="/logo.jpeg" alt="Logo" style={{ width: "130px", marginRight: "10px" }} />
           <Box>
             <Typography variant="h5">SREE EXIM SOLUTIONS</Typography>
             <Typography variant="body2">
@@ -226,7 +218,7 @@ export default function App() {
 
         <table
           style={{
-            width: "100%",
+            width: "40%",
             marginBottom: "5px",
             fontSize: "15px",
             borderCollapse: "collapse",
