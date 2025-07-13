@@ -70,8 +70,8 @@ export default function App() {
       "cargoDesc",
       "delivery",
       "packages",
-      "measurement",
-      "grossWt"
+      "grossWt",
+      "measurement"
     ];
 
     const missingFields = requiredFields.filter((field) => !form[field]);
@@ -158,7 +158,7 @@ export default function App() {
           </Grid>
 
           <Grid item xs={12} sm={6}>
-            <TextField label="Measurement" name="measurement" value={form.measurement} onChange={handleChange} fullWidth />
+            <TextField label="Measurement" name="measurement" value={form.measurement} onChange={handleChange} fullWidth required/>
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField label="Gross Weight" name="grossWt" value={form.grossWt} onChange={handleChange} fullWidth required />
