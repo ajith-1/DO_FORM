@@ -7,11 +7,15 @@ import {
   TextField,
   Typography,
   Paper,
-  MenuItem
+  MenuItem,
+  Divider
 } from "@mui/material";
 import html2pdf from "html2pdf.js";
 import "./style.css";
 // import logo from "../public/logo.jpeg";
+import logoBase64 from "./Demo";
+
+
 
 export default function App() {
   const [form, setForm] = useState({
@@ -23,7 +27,7 @@ export default function App() {
     containerType: "",
     consignee: "",
     cargoDesc: "",
-    delivery: "",
+    delivery: "FULL",
     packages: "",
     packageType: "",
     measurement: "",
@@ -186,7 +190,7 @@ export default function App() {
       <Paper sx={{ p: 4 }} ref={previewRef}>
         <Box display="flex" mb={2}>
           <img 
-          src={`${window.location.origin}/logo.jpeg`} 
+          src={logoBase64} 
           alt="Logo" 
           style={{ width: "100px", marginRight: "10px" }}
           crossOrigin="anonymous"
@@ -194,17 +198,25 @@ export default function App() {
           <Box>
             <Typography variant="h5">SREE EXIM SOLUTIONS</Typography>
             <Typography variant="body2">
-              ADD: UNIT NO. T-2310 | BLOCK B 3RD FLOOR | ARDENTE OFFICE ONE HOODI MAIN RD 
-              BENGALURU 560048 INDIA.
+              ADD: UNIT NO. T-2310 | BLOCK B 3RD FLOOR | ARDENTE OFFICE ONE HOODI MAIN RD | BENGALURU 560048.
               <br />
               Phone: 080-4111 4344 | Email: sesblr@sreegroup.net | Website:
               https://www.sreegroup.net
             </Typography>
           </Box>
         </Box>
-
-        <Typography variant="h6" align="center" gutterBottom>
-          DELIVERY ORDER
+        <Box sx={{ width: "100%", my: 2 }}>
+      <Divider
+        sx={{
+          "&::before, &::after": {
+            borderColor: "black", // line color set to black
+          },
+        }}
+      >
+      </Divider>
+    </Box>
+        <Typography variant="h6" align="center" >
+          <strong>DELIVERY ORDER</strong><br/><br/>
         </Typography>
 
         <Box mb={1}>
@@ -223,7 +235,7 @@ export default function App() {
 
         <table
           style={{
-            width: "40%",
+            width: "80%",
             marginBottom: "5px",
             fontSize: "15px",
             borderCollapse: "collapse",
@@ -232,14 +244,14 @@ export default function App() {
         >
           <tbody>
             {[
-              ["BL NO", `${form.blNo} Date: ${formatDate(form.blDate)}`],
+              ["BL NO", `${form.blNo}  Date: ${formatDate(form.blDate)}`],
               ["MASTER BL NO", form.masterBlNo],
               ["Container No(s)", `${form.containerNo} ${form.containerType}`],
               ["Consignee", form.consignee],
               ["Cargo Description", form.cargoDesc],
               ["Delivery", form.delivery],
               ["No. of Packages", `${form.packages} ${form.packageType}`],
-              ["Measurement", form.measurement],
+              ["Measurement", `${form.measurement} CBM`],
               ["Gross Wt.", `${form.grossWt} KGS`],
               ["Vessel / Voyage", form.vessel],
               ["Rotation IGM No", form.rotationIgm],
@@ -259,9 +271,9 @@ export default function App() {
           </tbody>
         </table>
 
-        <Typography>Marks & Nos.</Typography>
+        <Typography><br/><br/>Marks & Nos.</Typography>
         <Typography>
-          This delivery order is valid till: {formatDate(form.validTill)}
+          This delivery order is valid till: <strong>{formatDate(form.validTill)}</strong>
         </Typography>
 
         <Typography variant="body2" color="text.secondary" mt={2}>
