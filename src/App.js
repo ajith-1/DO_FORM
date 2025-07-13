@@ -6,32 +6,44 @@ import {
   Grid,
   TextField,
   Typography,
-  Paper
+  Paper,
+  MenuItem
 } from "@mui/material";
 import html2pdf from "html2pdf.js";
-import logo from "./asset/logo.jpg";
+import "./style.css";
+
+// ✅ Your logo as Base64
+const logoBase64 =
+  "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcU" +
+  "FhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoK" +
+  "CgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAyADIDASIAAhEBAxEB/8QAGwAAAwEBAQEBAAAAAAAAAAAAAQ" +
+  "UGAwQCBwj/xAA9EAABAwIEAwYEBQIGAwAAAAABAAIRAwQFEiExQQYTIlFhcRQygZGhsdHwQlJywdEUU2KSk+HxM1L/xAAXAQE" +
+  "BAQEAAAAAAAAAAAAAAAAAAgED/8QAGhEBAQEAAwEAAAAAAAAAAAAAAAERAhIhMf/aAAwDAQACEQMRAD8A9zREQBERAEREARE" +
+  "QBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQB//2Q==";
 
 export default function App() {
   const [form, setForm] = useState({
-    doDate: "2025-07-10",
-    blNo: "O250612EVE039",
-    blDate: "2025-06-19",
-    masterBlNo: "GGZ2571533",
-    containerNo: "CAIU6293870",
-    containerType: "1x20GP",
-    consignee: "SNOOKER ALLEY",
-    cargoDesc: "SNOOKER TABLE COMPLETE",
-    delivery: "FULL",
-    packages: "272 PKG",
-    measurement: "-",
-    grossWt: "15753 KGS",
-    vessel: "-",
-    rotationIgm: "Date: -",
-    localIgm: "Date: -",
-    smtpNo: "-",
-    subLineNo: "-",
-    destuffing: "Date: -",
-    validTill: "2025-07-17"
+    doDate: "",
+    blNo: "",
+    blDate: "",
+    masterBlNo: "",
+    containerNo: "",
+    containerType: "",
+    consignee: "",
+    cargoDesc: "",
+    delivery: "",
+    packages: "",
+    packageType: "",
+    measurement: "",
+    grossWt: "",
+    vessel: "",
+    rotationIgm: "",
+    localIgm: "",
+    smtpNo: "",
+    subLineNo: "",
+    destuffing: "",
+    validTill: "",
+    address: "INLAND CONTAINER DEPOT (ICD)\nWHITE FIELD BANGALORE"
   });
 
   const previewRef = useRef();
@@ -53,10 +65,30 @@ export default function App() {
   };
 
   const generatePDF = () => {
+    const requiredFields = [
+      "doDate",
+      "blNo",
+      "masterBlNo",
+      "containerNo",
+      "consignee",
+      "cargoDesc",
+      "delivery",
+      "packages",
+      "measurement",
+      "grossWt"
+    ];
+
+    const missingFields = requiredFields.filter((field) => !form[field]);
+
+    if (missingFields.length > 0) {
+      alert("Please fill all required fields before downloading the PDF.");
+      return;
+    }
+
     const element = previewRef.current;
     const opt = {
-      margin: 0.5,
-      filename: "SES Delivery_Order.pdf",
+      margin: 0.3,
+      filename: "SES_Delivery_Order.pdf",
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: { scale: 2, useCORS: true },
       jsPDF: { unit: "in", format: "a4", orientation: "portrait" }
@@ -64,255 +96,169 @@ export default function App() {
     html2pdf().set(opt).from(element).save();
   };
 
+  const addressOptions = [
+    "INLAND CONTAINER DEPOT (ICD)\nWHITE FIELD BANGALORE",
+    "PEARL CONTAINER TERMINALS,\nNO.53, SIPCOT INDUSTRIAL COMPLEX,\nPHASE-I, HOSUR – 635126"
+  ];
+
   return (
     <Container sx={{ mt: 4, mb: 4 }}>
       <Typography variant="h4" align="center" color="primary" gutterBottom>
-        Delivery Order 
+        Delivery Order
       </Typography>
 
       <Paper sx={{ p: 3, mb: 4 }}>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12}>
             <TextField
-              label="Date"
-              type="date"
-              name="doDate"
-              value={form.doDate}
+              select
+              label="Address"
+              name="address"
+              value={form.address}
               onChange={handleChange}
               fullWidth
-              InputLabelProps={{ shrink: true }}
-            />
+            >
+              {addressOptions.map((option, index) => (
+                <MenuItem key={index} value={option}>
+                  {option.split("\n")[0]}
+                </MenuItem>
+              ))}
+            </TextField>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
-              label="BL No"
-              name="blNo"
-              value={form.blNo}
-              onChange={handleChange}
-              fullWidth
-            />
+            <TextField label="Date" type="date" name="doDate" value={form.doDate} onChange={handleChange} fullWidth InputLabelProps={{ shrink: true }} required />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
-              label="BL Date"
-              type="date"
-              name="blDate"
-              value={form.blDate}
-              onChange={handleChange}
-              fullWidth
-              InputLabelProps={{ shrink: true }}
-            />
+            <TextField label="BL No" name="blNo" value={form.blNo} onChange={handleChange} fullWidth required />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
-              label="Master BL No"
-              name="masterBlNo"
-              value={form.masterBlNo}
-              onChange={handleChange}
-              fullWidth
-            />
-          </Grid>
-
-          {/* Container No and Container Type side by side */}
-          <Grid item xs={12} sm={6}>
-            <TextField
-              label="Container No(s)"
-              name="containerNo"
-              value={form.containerNo}
-              onChange={handleChange}
-              fullWidth
-            />
+            <TextField label="BL Date" type="date" name="blDate" value={form.blDate} onChange={handleChange} fullWidth InputLabelProps={{ shrink: true }} required />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
-              label="Container Type"
-              name="containerType"
-              value={form.containerType}
-              onChange={handleChange}
-              fullWidth
-            />
+            <TextField label="Master BL No" name="masterBlNo" value={form.masterBlNo} onChange={handleChange} fullWidth required />
           </Grid>
 
           <Grid item xs={12} sm={6}>
-            <TextField
-              label="Consignee"
-              name="consignee"
-              value={form.consignee}
-              onChange={handleChange}
-              fullWidth
-            />
+            <TextField label="Container No(s)" name="containerNo" value={form.containerNo} onChange={handleChange} fullWidth required />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
-              label="Cargo Description"
-              name="cargoDesc"
-              value={form.cargoDesc}
-              onChange={handleChange}
-              fullWidth
-            />
+            <TextField label="Container Type" name="containerType" value={form.containerType} onChange={handleChange} fullWidth required />
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
+            <TextField label="Consignee" name="consignee" value={form.consignee} onChange={handleChange} fullWidth required />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
-              label="Delivery"
-              name="delivery"
-              value={form.delivery}
-              onChange={handleChange}
-              fullWidth
-            />
+            <TextField label="Cargo Description" name="cargoDesc" value={form.cargoDesc} onChange={handleChange} fullWidth required />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <TextField label="No. of Packages" name="packages" value={form.packages} onChange={handleChange} fullWidth required />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <TextField label="Package Type" name="packageType" value={form.packageType} onChange={handleChange} fullWidth required />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <TextField label="Delivery" name="delivery" value={form.delivery} onChange={handleChange} fullWidth required />
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
+            <TextField label="Measurement" name="measurement" value={form.measurement} onChange={handleChange} fullWidth />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
-              label="No. of Packages"
-              name="packages"
-              value={form.packages}
-              onChange={handleChange}
-              fullWidth
-            />
+            <TextField label="Gross Weight" name="grossWt" value={form.grossWt} onChange={handleChange} fullWidth required />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
-              label="Measurement"
-              name="measurement"
-              value={form.measurement}
-              onChange={handleChange}
-              fullWidth
-            />
+            <TextField label="Vessel / Voyage" name="vessel" value={form.vessel} onChange={handleChange} fullWidth />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
-              label="Gross Weight"
-              name="grossWt"
-              value={form.grossWt}
-              onChange={handleChange}
-              fullWidth
-            />
+            <TextField label="Rotation IGM No" name="rotationIgm" value={form.rotationIgm} onChange={handleChange} fullWidth />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
-              label="Vessel / Voyage"
-              name="vessel"
-              value={form.vessel}
-              onChange={handleChange}
-              fullWidth
-            />
+            <TextField label="Local IGM No" name="localIgm" value={form.localIgm} onChange={handleChange} fullWidth />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
-              label="Rotation IGM No"
-              name="rotationIgm"
-              value={form.rotationIgm}
-              onChange={handleChange}
-              fullWidth
-            />
+            <TextField label="SMTP No" name="smtpNo" value={form.smtpNo} onChange={handleChange} fullWidth />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
-              label="Local IGM No"
-              name="localIgm"
-              value={form.localIgm}
-              onChange={handleChange}
-              fullWidth
-            />
+            <TextField label="Sub-Line No" name="subLineNo" value={form.subLineNo} onChange={handleChange} fullWidth />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
-              label="SMTP No"
-              name="smtpNo"
-              value={form.smtpNo}
-              onChange={handleChange}
-              fullWidth
-            />
+            <TextField label="De-stuffing Station" name="destuffing" value={form.destuffing} onChange={handleChange} fullWidth />
           </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              label="Sub-Line No"
-              name="subLineNo"
-              value={form.subLineNo}
-              onChange={handleChange}
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              label="De-stuffing Station"
-              name="destuffing"
-              value={form.destuffing}
-              onChange={handleChange}
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              label="Valid Till"
-              type="date"
-              name="validTill"
-              value={form.validTill}
-              onChange={handleChange}
-              fullWidth
-              InputLabelProps={{ shrink: true }}
-            />
+          <Grid item xs={12}>
+            <TextField label="Valid Till" type="date" name="validTill" value={form.validTill} onChange={handleChange} fullWidth InputLabelProps={{ shrink: true }} required />
           </Grid>
         </Grid>
       </Paper>
 
-      <Paper sx={{ p: 3 }} ref={previewRef}>
-        <Box textAlign="" mb={2}>
-          <img
-            src={logo}
-            alt="Logo"
-            style={{ width: "150px", marginBottom: "10px" }}
-          />
-          <Typography variant="h6">SREE EXIM SOLUTIONS</Typography>
-          <Typography variant="body2">
-            ADD: NO. S1 SV YASHAS, 4TH FLOOR (LIFT 5TH), D SILVA LAYOUT,
-            WHITEFIELD, BANGALORE 560066 INDIA.
-            <br />
-            Phone: 080-41739105 | Email: sesblr@sreegroup.net | Website:
-            https://www.sreegroup.net
-          </Typography>
+      <Paper sx={{ p: 4 }} ref={previewRef}>
+        <Box display="flex" mb={2}>
+          <img src={logoBase64} alt="Logo" style={{ width: "130px", marginRight: "10px" }} />
+          <Box>
+            <Typography variant="h5">SREE EXIM SOLUTIONS</Typography>
+            <Typography variant="body2">
+              ADD: NO. S1 SV YASHAS, 4TH FLOOR (LIFT 5TH), D SILVA LAYOUT,
+              WHITEFIELD, BANGALORE 560066 INDIA.
+              <br />
+              Phone: 080-41739105 | Email: sesblr@sreegroup.net | Website:
+              https://www.sreegroup.net
+            </Typography>
+          </Box>
         </Box>
 
-        <Typography variant="h5" gutterBottom>
+        <Typography variant="h6" align="center" gutterBottom>
           DELIVERY ORDER
         </Typography>
 
-        <Typography>
-          To,<br />
-          The Manager<br />
-          INLAND CONTAINER DEPOT (ICD)<br />
-          WHITE FIELD BANGALORE<br />
-          <strong>Date: {formatDate(form.doDate)}</strong>
-        </Typography>
+        <Box mb={1}>
+          <Typography style={{ whiteSpace: "pre-line", textTransform: "uppercase" }}>
+            To,<br />
+            THE MANAGER<br />
+            {form.address}
+          </Typography>
+          <Typography textAlign={"end"}><strong>Date: {formatDate(form.doDate)}</strong></Typography>
+        </Box>
 
-        <Typography paragraph mt={2}>Dear Sir,</Typography>
+        <Typography paragraph>Dear Sir,</Typography>
         <Typography paragraph>
-          You are requested to kindly make delivery of the below mentioned
-          container(s), whose details are as follows:
+          You are requested to kindly make delivery of the below mentioned container(s), whose details are as follows:
         </Typography>
 
-        <table style={{ width: "100%", marginBottom: "10px" }}>
+        <table
+          style={{
+            width: "100%",
+            marginBottom: "5px",
+            fontSize: "15px",
+            borderCollapse: "collapse",
+            lineHeight: "1.2"
+          }}
+        >
           <tbody>
-            <tr>
-              <td>BL NO :</td>
-              <td>{form.blNo} Date: {formatDate(form.blDate)}</td>
-            </tr>
-            <tr><td>MASTER BL NO :</td><td>{form.masterBlNo}</td></tr>
-            <tr>
-              <td>Container No(s) :</td>
-              <td>{form.containerNo} {form.containerType}</td>
-            </tr>
-            <tr><td>Consignee :</td><td>{form.consignee}</td></tr>
-            <tr><td>Cargo Description :</td><td>{form.cargoDesc}</td></tr>
-            <tr><td>Delivery :</td><td>{form.delivery}</td></tr>
-            <tr><td>No. of Packages :</td><td>{form.packages}</td></tr>
-            <tr><td>Measurement :</td><td>{form.measurement}</td></tr>
-            <tr><td>Gross Wt. :</td><td>{form.grossWt}</td></tr>
-            <tr><td>Vessel / Voyage :</td><td>{form.vessel}</td></tr>
-            <tr><td>Rotation IGM No :</td><td>{form.rotationIgm}</td></tr>
-            <tr><td>Local IGM No. :</td><td>{form.localIgm}</td></tr>
-            <tr><td>SMTP No. :</td><td>{form.smtpNo}</td></tr>
-            <tr><td>Sub-Line No. :</td><td>{form.subLineNo}</td></tr>
-            <tr><td>De-stuffing Station :</td><td>{form.destuffing}</td></tr>
+            {[
+              ["BL NO", `${form.blNo} Date: ${formatDate(form.blDate)}`],
+              ["MASTER BL NO", form.masterBlNo],
+              ["Container No(s)", `${form.containerNo} ${form.containerType}`],
+              ["Consignee", form.consignee],
+              ["Cargo Description", form.cargoDesc],
+              ["Delivery", form.delivery],
+              ["No. of Packages", `${form.packages} ${form.packageType}`],
+              ["Measurement", form.measurement],
+              ["Gross Wt.", `${form.grossWt} KGS`],
+              ["Vessel / Voyage", form.vessel],
+              ["Rotation IGM No", form.rotationIgm],
+              ["Local IGM No.", form.localIgm],
+              ["SMTP No.", form.smtpNo],
+              ["Sub-Line No.", form.subLineNo],
+              ["De-stuffing Station", form.destuffing],
+            ].map(([label, value], index) => (
+              <tr key={index}>
+                <td style={{ padding: "2px 4px", whiteSpace: "nowrap", verticalAlign: "top" }}>
+                  <strong>{label}</strong>
+                </td>
+                <td style={{ padding: "2px 4px", verticalAlign: "top" }}>:</td>
+                <td style={{ padding: "2px 4px" }}>{value}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
 
@@ -322,22 +268,15 @@ export default function App() {
         </Typography>
 
         <Typography variant="body2" color="text.secondary" mt={2}>
-          NOIE: NO MANUAL REVALIDATION OF DATE IS ALLOWED ON THIS DELIVERY
-          ORDER, ONLY FRESH DELIVERY ORDER TO BE ACCEPTED.
+          NOTE: NO MANUAL REVALIDATION OF DATE IS ALLOWED ON THIS DELIVERY ORDER, ONLY FRESH DELIVERY ORDER TO BE ACCEPTED.
         </Typography>
 
         <Typography variant="body2" align="center" mt={2}>
-          (THIS IS A COMPUTER-GENERATED DOCUMENT AND DOES NOT REQUIRE A SEAL &
-          SIGNATURE.)
+          (THIS IS A COMPUTER-GENERATED DOCUMENT AND DOES NOT REQUIRE A SEAL & SIGNATURE.)
         </Typography>
       </Paper>
 
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={generatePDF}
-        sx={{ mt: 3 }}
-      >
+      <Button variant="contained" color="primary" onClick={generatePDF} sx={{ mt: 3 }}>
         Download PDF
       </Button>
     </Container>
