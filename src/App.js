@@ -8,14 +8,12 @@ import {
   Typography,
   Paper,
   MenuItem,
-  Divider
+  Divider,
+  Autocomplete,
 } from "@mui/material";
 import html2pdf from "html2pdf.js";
 import "./style.css";
-// import logo from "../public/logo.jpeg";
 import logoBase64 from "./Demo";
-
-
 
 export default function App() {
   const [form, setForm] = useState({
@@ -39,7 +37,8 @@ export default function App() {
     subLineNo: "",
     destuffing: "",
     validTill: "",
-    address: "INLAND CONTAINER DEPOT (ICD)\nWHITE FIELD BANGALORE"
+    address:
+      "INLAND CONTAINER DEPOT (ICD)\nWHITE FIELD BANGALORE",
   });
 
   const previewRef = useRef();
@@ -71,10 +70,12 @@ export default function App() {
       "delivery",
       "packages",
       "grossWt",
-      "measurement"
+      "measurement",
     ];
 
-    const missingFields = requiredFields.filter((field) => !form[field]);
+    const missingFields = requiredFields.filter(
+      (field) => !form[field]
+    );
 
     if (missingFields.length > 0) {
       alert("Please fill all required fields before downloading the PDF.");
@@ -87,20 +88,27 @@ export default function App() {
       filename: "SES_Delivery_Order.pdf",
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: "in", format: "a4", orientation: "portrait" }
+      jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
     };
-    html2pdf().set(opt).from(element).save();
+
+    html2pdf().set(opt).from(element).save().then(() => {
+      // alert("PDF Downloaded Successfully!");
+    });
   };
 
   const addressOptions = [
     "INLAND CONTAINER DEPOT (ICD)\nWHITE FIELD BANGALORE",
-    "PEARL CONTAINER TERMINALS,\nNO.53, SIPCOT INDUSTRIAL COMPLEX,\nPHASE-I, HOSUR – 635126"
+    "PEARL CONTAINER TERMINALS,\nNO.53, SIPCOT INDUSTRIAL COMPLEX,\nPHASE-I, HOSUR – 635126",
   ];
 
+  const containerTypes = ["20", "40", "45", "LCL"];
+  const packageTypes = ["NOS", "PKG", "PLT", "BLS", "CTN", "CRT", "RLS", "PCS", "DRM"];
+
   return (
-    <Container sx={{ mt: 4, mb: 4, }}>
+    <Container sx={{ mt: 4, mb: 4 }}>
       <Typography variant="h5" align="center" color="primary" gutterBottom>
-      SREE EXIM SOLUTIONS <br/> DELIVERY ORDER
+        SREE EXIM SOLUTIONS <br />
+        DELIVERY ORDER
       </Typography>
 
       <Paper sx={{ p: 3, mb: 4 }}>
@@ -133,14 +141,20 @@ export default function App() {
           <Grid item xs={12} sm={6}>
             <TextField label="Master BL No" name="masterBlNo" value={form.masterBlNo} onChange={handleChange} fullWidth required />
           </Grid>
-
           <Grid item xs={12} sm={6}>
             <TextField label="Container No(s)" name="containerNo" value={form.containerNo} onChange={handleChange} fullWidth required />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField label="Container Type" name="containerType" value={form.containerType} onChange={handleChange} fullWidth required />
+            <Autocomplete
+              freeSolo
+              options={containerTypes}
+              value={form.containerType}
+              onInputChange={(e, newValue) => setForm({ ...form, containerType: newValue })}
+              renderInput={(params) => (
+                <TextField {...params} label="Container Type" fullWidth required />
+              )}
+            />
           </Grid>
-
           <Grid item xs={12} sm={6}>
             <TextField label="Consignee" name="consignee" value={form.consignee} onChange={handleChange} fullWidth required />
           </Grid>
@@ -150,15 +164,22 @@ export default function App() {
           <Grid item xs={12} sm={4}>
             <TextField label="No. of Packages" name="packages" value={form.packages} onChange={handleChange} fullWidth required />
           </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField label="Package Type" name="packageType" value={form.packageType} onChange={handleChange} fullWidth required />
+          <Grid item xs={12} sm={6}>
+            <Autocomplete
+              freeSolo
+              options={packageTypes}
+              value={form.packageType}
+              onInputChange={(e, newValue) => setForm({ ...form, packageType: newValue })}
+              renderInput={(params) => (
+                <TextField {...params} label="Package Type" fullWidth required />
+              )}
+            />
           </Grid>
           <Grid item xs={12} sm={4}>
             <TextField label="Delivery" name="delivery" value={form.delivery} onChange={handleChange} fullWidth required />
           </Grid>
-
           <Grid item xs={12} sm={6}>
-            <TextField label="Measurement" name="measurement" value={form.measurement} onChange={handleChange} fullWidth required/>
+            <TextField label="Measurement" name="measurement" value={form.measurement} onChange={handleChange} fullWidth required />
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField label="Gross Weight" name="grossWt" value={form.grossWt} onChange={handleChange} fullWidth required />
@@ -189,43 +210,39 @@ export default function App() {
 
       <Paper sx={{ p: 4 }} ref={previewRef}>
         <Box display="flex" mb={2}>
-          <img 
-          src={logoBase64} 
-          alt="Logo" 
-          style={{ width: "100px", marginRight: "10px" }}
-          crossOrigin="anonymous"
-           />
+          <img
+            src={logoBase64}
+            alt="Logo"
+            style={{ width: "100px", marginRight: "10px" }}
+            crossOrigin="anonymous"
+          />
           <Box>
-            <Typography variant="h5">SREE EXIM SOLUTIONS</Typography>
+            <Typography variant="h4"><strong>SREE EXIM SOLUTIONS</strong></Typography>
             <Typography variant="body2">
               ADD: UNIT NO. T-2310 | BLOCK B 3RD FLOOR | ARDENTE OFFICE ONE HOODI MAIN RD | BENGALURU 560048.
               <br />
-              Phone: 080-4111 4344 | Email: sesblr@sreegroup.net | Website:
-              https://www.sreegroup.net
+              Phone: 080-4111 4344 | Email: sesblr@sreegroup.net | Website: https://www.sreegroup.net
             </Typography>
           </Box>
         </Box>
-        <Box sx={{ width: "100%", my: 2 }}>
-      <Divider
-        sx={{
-          "&::before, &::after": {
-            borderColor: "black", // line color set to black
-          },
-        }}
-      >
-      </Divider>
-    </Box>
-        <Typography variant="h6" align="center" >
-          <strong>DELIVERY ORDER</strong><br/><br/>
+
+        <Divider sx={{ "&::before, &::after": { borderColor: "black" }, my: 2 }} />
+
+        <Typography variant="h6" align="center">
+          <strong>DELIVERY ORDER</strong>
         </Typography>
 
         <Box mb={1}>
           <Typography style={{ whiteSpace: "pre-line", textTransform: "uppercase" }}>
-            To,<br />
-            THE MANAGER<br />
+            To,
+            <br />
+            THE MANAGER
+            <br />
             {form.address}
           </Typography>
-          <Typography textAlign={"end"}><strong>Date: {formatDate(form.doDate)}</strong></Typography>
+          <Typography textAlign={"end"}>
+            <strong>Date: {formatDate(form.doDate)}</strong>
+          </Typography>
         </Box>
 
         <Typography paragraph>Dear Sir,</Typography>
@@ -233,15 +250,7 @@ export default function App() {
           You are requested to kindly make delivery of the below mentioned container(s), whose details are as follows:
         </Typography>
 
-        <table
-          style={{
-            width: "80%",
-            marginBottom: "5px",
-            fontSize: "15px",
-            borderCollapse: "collapse",
-            lineHeight: "1.2"
-          }}
-        >
+        <table style={{ width: "80%", marginBottom: "5px", fontSize: "15px", borderCollapse: "collapse", lineHeight: "1.2" }}>
           <tbody>
             {[
               ["BL NO", `${form.blNo}  Date: ${formatDate(form.blDate)}`],
@@ -271,7 +280,7 @@ export default function App() {
           </tbody>
         </table>
 
-        <Typography><br/><br/>Marks & Nos.</Typography>
+        <Typography><br /><br />Marks & Nos.</Typography>
         <Typography>
           This delivery order is valid till: <strong>{formatDate(form.validTill)}</strong>
         </Typography>
