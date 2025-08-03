@@ -7,3 +7,30 @@
 .title {
 font-weight: bold;
 }
+
+.arrow-button {
+  display: inline-flex;
+  align-items: center;
+  background: #1976d2;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.3s;
+}
+
+.arrow-button:hover {
+  background: #115293;
+}
+
+.arrow-icon {
+  display: inline-block;
+  margin-left: 10px;
+  transition: transform 0.3s ease;
+}
+
+.arrow-button:hover .arrow-icon {
+  transform: translateX(6px);
+}

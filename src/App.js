@@ -1,3 +1,4 @@
+// Enhanced Delivery Order App with Modern Theme, Animated Download Button, and Success Toast
 import React, { useState, useRef } from "react";
 import {
   Box,
@@ -10,10 +11,33 @@ import {
   MenuItem,
   Divider,
   Autocomplete,
+  Snackbar,
+  Alert,
+  CssBaseline,
+  ThemeProvider,
+  createTheme,
+  CircularProgress,
 } from "@mui/material";
+import { motion, AnimatePresence } from "framer-motion";
 import html2pdf from "html2pdf.js";
-import "./style.css";
 import logoBase64 from "./Demo";
+import "./style.css";
+import { ChevronRight } from "@mui/icons-material";
+
+const theme = createTheme({
+  palette: {
+    mode: "light",
+    primary: {
+      main: "#1976d2", 
+    },
+    background: {
+      default: "#f5f5f5",
+    },
+  },
+  typography: {
+    fontFamily: "'Segoe UI', sans-serif",
+  },
+});
 
 export default function App() {
   const [form, setForm] = useState({
@@ -41,10 +65,12 @@ export default function App() {
       "INLAND CONTAINER DEPOT (ICD)\nWHITE FIELD BANGALORE",
   });
 
+  const [openToast, setOpenToast] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const previewRef = useRef();
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm({ ...form, [e.target.name]: e.target.value.toUpperCase() });
   };
 
   const formatDate = (dateStr) => {
@@ -73,15 +99,14 @@ export default function App() {
       "measurement",
     ];
 
-    const missingFields = requiredFields.filter(
-      (field) => !form[field]
-    );
+    const missingFields = requiredFields.filter((field) => !form[field]);
 
     if (missingFields.length > 0) {
       alert("Please fill all required fields before downloading the PDF.");
       return;
     }
 
+    setIsDownloading(true);
     const element = previewRef.current;
     const opt = {
       margin: 0.3,
@@ -91,9 +116,14 @@ export default function App() {
       jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
     };
 
-    html2pdf().set(opt).from(element).save().then(() => {
-      // alert("PDF Downloaded Successfully!");
-    });
+    html2pdf()
+      .set(opt)
+      .from(element)
+      .save()
+      .then(() => {
+        setIsDownloading(false);
+        setOpenToast(true);
+      });
   };
 
   const addressOptions = [
@@ -101,48 +131,60 @@ export default function App() {
     "PEARL CONTAINER TERMINALS,\nNO.53, SIPCOT INDUSTRIAL COMPLEX,\nPHASE-I, HOSUR – 635126",
   ];
 
-  const containerTypes = ["20", "40", "45", "LCL"];
-  const packageTypes = ["NOS", "PKG", "PLT", "BLS", "CTN", "CRT", "RLS", "PCS", "DRM"];
+  const containerTypes = ["20", "40", "20HC", "40HC", "45", "LCL"];
+  const packageTypes = ["BDL", "CAS","SHT","CHT","CLS","COL","CON","CRT","CSK","CTN","CYL","DRM","ENV","FLK","FUT","HBK","JBL","JTA","KEG","LFT","LOG","NGT","PAL","PKG","PLT","QDS","REL","RLS","SKD","SLB","TBL","TIN","TRK","UNT","PCS"];
 
   return (
-    <Container sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h5" align="center" color="primary" gutterBottom>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+      >
+        <Container sx={{ mt: 4, mb: 4 }}>
+          {/* ...Form and Preview Components... */}
+          <Typography variant="h5" align="center" color="primary" gutterBottom>
         SREE EXIM SOLUTIONS <br />
         DELIVERY ORDER
       </Typography>
 
       <Paper sx={{ p: 3, mb: 4 }}>
         <Grid container spacing={2}>
+        <Grid item xs={12} sm={6}>
+          <Typography sx={{ minWidth: 250, fontSize:"24" }}>WELCOME <span className="arrow-icon"><ChevronRight /></span></Typography>
+          </Grid>
           <Grid item xs={12}>
-            <TextField
+            <TextField 
+              sx={{ maxWidth: 250, fontSize: "10" }}
               select
               label="Address"
               name="address"
               value={form.address}
               onChange={handleChange}
-              fullWidth
+              
             >
               {addressOptions.map((option, index) => (
                 <MenuItem key={index} value={option}>
                   {option.split("\n")[0]}
                 </MenuItem>
               ))}
-            </TextField>
+            </TextField >
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField label="Date" type="date" name="doDate" value={form.doDate} onChange={handleChange} fullWidth InputLabelProps={{ shrink: true }} required />
+            <TextField sx={{ minWidth: 250 }} label="Date" type="date" name="doDate" value={form.doDate} onChange={handleChange} fullWidth InputLabelProps={{ shrink: true }} required />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField label="BL No" name="blNo" value={form.blNo} onChange={handleChange} fullWidth required />
+            <TextField sx={{ minWidth: 250 }} label="BL No" name="blNo" value={form.blNo} onChange={handleChange} fullWidth required />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField label="BL Date" type="date" name="blDate" value={form.blDate} onChange={handleChange} fullWidth InputLabelProps={{ shrink: true }} required />
+            <TextField sx={{ minWidth: 250 }} label="BL Date" type="date" name="blDate" value={form.blDate} onChange={handleChange} fullWidth InputLabelProps={{ shrink: true }} required />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField label="Master BL No" name="masterBlNo" value={form.masterBlNo} onChange={handleChange} fullWidth required />
+            <TextField sx={{ minWidth: 250 }} label="Master BL No" name="masterBlNo" value={form.masterBlNo} onChange={handleChange} fullWidth required />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField label="Container No(s)" name="containerNo" value={form.containerNo} onChange={handleChange} fullWidth required />
+            <TextField sx={{ minWidth: 250 }} label="Container No(s)" name="containerNo" value={form.containerNo} onChange={handleChange} fullWidth required />
           </Grid>
           <Grid item xs={12} sm={6}>
             <Autocomplete
@@ -151,18 +193,18 @@ export default function App() {
               value={form.containerType}
               onInputChange={(e, newValue) => setForm({ ...form, containerType: newValue })}
               renderInput={(params) => (
-                <TextField {...params} label="Container Type" fullWidth required />
+                <TextField sx={{ minWidth: 250 }} {...params} label="Container Type" fullWidth required />
               )}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField label="Consignee" name="consignee" value={form.consignee} onChange={handleChange} fullWidth required />
+            <TextField sx={{ minWidth: 250 }} label="Consignee" name="consignee" value={form.consignee} onChange={handleChange} fullWidth required />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField label="Cargo Description" name="cargoDesc" value={form.cargoDesc} onChange={handleChange} fullWidth required />
+            <TextField sx={{ minWidth: 250 }} label="Cargo Description" name="cargoDesc" value={form.cargoDesc} onChange={handleChange} fullWidth required />
           </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField label="No. of Packages" name="packages" value={form.packages} onChange={handleChange} fullWidth required />
+          <Grid item xs={12} sm={6}>
+            <TextField sx={{ minWidth: 250 }} label="No. of Packages" name="packages" value={form.packages} onChange={handleChange} fullWidth required />
           </Grid>
           <Grid item xs={12} sm={6}>
             <Autocomplete
@@ -171,39 +213,39 @@ export default function App() {
               value={form.packageType}
               onInputChange={(e, newValue) => setForm({ ...form, packageType: newValue })}
               renderInput={(params) => (
-                <TextField {...params} label="Package Type" fullWidth required />
+                <TextField sx={{ minWidth: 250 }}{...params} label="Package Type" fullWidth required />
               )}
             />
           </Grid>
           <Grid item xs={12} sm={4}>
-            <TextField label="Delivery" name="delivery" value={form.delivery} onChange={handleChange} fullWidth required />
+            <TextField sx={{ minWidth: 250 }}label="Delivery" name="delivery" value={form.delivery} onChange={handleChange} fullWidth required />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField label="Measurement" name="measurement" value={form.measurement} onChange={handleChange} fullWidth required />
+            <TextField sx={{ minWidth: 250 }}label="Measurement" name="measurement" value={form.measurement} onChange={handleChange} fullWidth required />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField label="Gross Weight" name="grossWt" value={form.grossWt} onChange={handleChange} fullWidth required />
+            <TextField sx={{ minWidth: 250 }}label="Gross Weight" name="grossWt" value={form.grossWt} onChange={handleChange} fullWidth required />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField label="Vessel / Voyage" name="vessel" value={form.vessel} onChange={handleChange} fullWidth />
+            <TextField sx={{ minWidth: 250 }} label="Vessel / Voyage" name="vessel" value={form.vessel} onChange={handleChange} fullWidth />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField label="Rotation IGM No" name="rotationIgm" value={form.rotationIgm} onChange={handleChange} fullWidth />
+            <TextField sx={{ minWidth: 250 }} label="Rotation IGM No" name="rotationIgm" value={form.rotationIgm} onChange={handleChange} fullWidth />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField label="Local IGM No" name="localIgm" value={form.localIgm} onChange={handleChange} fullWidth />
+            <TextField sx={{ minWidth: 250 }} label="Local IGM No" name="localIgm" value={form.localIgm} onChange={handleChange} fullWidth />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField label="SMTP No" name="smtpNo" value={form.smtpNo} onChange={handleChange} fullWidth />
+            <TextField sx={{ minWidth: 250 }} label="SMTP No" name="smtpNo" value={form.smtpNo} onChange={handleChange} fullWidth />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField label="Sub-Line No" name="subLineNo" value={form.subLineNo} onChange={handleChange} fullWidth />
+            <TextField sx={{ minWidth: 250 }} label="Sub-Line No" name="subLineNo" value={form.subLineNo} onChange={handleChange} fullWidth />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField label="De-stuffing Station" name="destuffing" value={form.destuffing} onChange={handleChange} fullWidth />
+            <TextField sx={{ minWidth: 250 }} label="De-stuffing Station" name="destuffing" value={form.destuffing} onChange={handleChange} fullWidth />
           </Grid>
           <Grid item xs={12}>
-            <TextField label="Valid Till" type="date" name="validTill" value={form.validTill} onChange={handleChange} fullWidth InputLabelProps={{ shrink: true }} required />
+            <TextField sx={{ minWidth: 250 }} label="Valid Till" type="date" name="validTill" value={form.validTill} onChange={handleChange} fullWidth InputLabelProps={{ shrink: true }} required />
           </Grid>
         </Grid>
       </Paper>
@@ -294,9 +336,49 @@ export default function App() {
         </Typography>
       </Paper>
 
-      <Button variant="contained" color="primary" onClick={generatePDF} sx={{ mt: 3 }}>
-        Download PDF
-      </Button>
-    </Container>
+      
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={generatePDF}
+              sx={{ mt: 3, px: 4, py: 1.5, fontWeight: "bold", borderRadius: "12px" }}
+              disabled={isDownloading}
+              startIcon={isDownloading ? <CircularProgress size={20} color="inherit" /> : "📄"}
+            >
+              {isDownloading ? "Generating..." : "Download PDF"}
+            </Button>
+
+          <AnimatePresence>
+            {openToast && (
+              <Snackbar
+                open={openToast}
+                autoHideDuration={1500}
+                onClose={() => setOpenToast(false)}
+                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+              >
+                <Alert
+                  onClose={() => setOpenToast(false)}
+                  severity="success"
+                  sx={{ width: "100%" }}
+                  variant="filled"
+                  icon={
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1, rotate: 360 }}
+                      exit={{ scale: 0 }}
+                      transition={{ type: "spring", stiffness: 200, damping: 10 }}
+                    >
+                      ✅
+                    </motion.div>
+                  }
+                >
+                  PDF downloaded successfully!
+                </Alert>
+              </Snackbar>
+            )}
+          </AnimatePresence>
+        </Container>
+      </motion.div>
+    </ThemeProvider>
   );
 }
