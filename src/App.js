@@ -39,9 +39,6 @@ export default function App() {
     blNo: "",
     blDate: "",
     masterBlNo: "",
-    containerCount: "",
-    containerNo: "",
-    containerType: "",
     consignee: "",
     cargoDesc: "",
     delivery: "FULL",
@@ -57,10 +54,46 @@ export default function App() {
     destuffing: "",
     validTill: "",
     address: "INLAND CONTAINER DEPOT (ICD)\nWHITE FIELD BANGALORE",
+    containers: [{ number: "", type: "" }],
   });
+
   const MotionButton = motion(Button);
   const [openToast, setOpenToast] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [containerCountInput, setContainerCountInput] = useState("1"); // string for raw input
+
+  // When "No. of Container" is changed
+  const handleContainerCountChange = (e) => {
+    const value = e.target.value;
+    setContainerCountInput(value); // let the user type freely
+  
+    const count = parseInt(value, 10);
+  
+    if (!isNaN(count) && count > 0) {
+      setForm((prev) => {
+        let newContainers = [...prev.containers];
+        if (count > newContainers.length) {
+          while (newContainers.length < count) {
+            newContainers.push({ number: "", type: "" });
+          }
+        } else if (count < newContainers.length) {
+          newContainers = newContainers.slice(0, count);
+        }
+        return { ...prev, containers: newContainers };
+      });
+    }
+  };
+  
+
+  // When individual container No/Type changes
+  const handleContainerChange = (index, field, value) => {
+    setForm((prev) => {
+      const updated = [...prev.containers];
+      updated[index][field] = value.toUpperCase();
+      return { ...prev, containers: updated };
+    });
+  };
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -89,8 +122,6 @@ export default function App() {
       "doDate",
       "blNo",
       "masterBlNo",
-      "containerCount",
-      "containerNo",
       "consignee",
       "cargoDesc",
       "delivery",
@@ -99,11 +130,14 @@ export default function App() {
       "measurement",
       "validTill",
     ];
+    
     const missing = required.filter((k) => !form[k]);
-    if (missing.length) {
+    const missingContainers = form.containers.some(c => !c.number || !c.type);
+    
+    if (missing.length || missingContainers) {
       alert("Please fill all required fields before downloading the PDF.");
       return;
-    }
+    }    
 
     setIsDownloading(true);
     try {
@@ -164,7 +198,11 @@ export default function App() {
       const rows = [
         ["BL NO", ":", `${form.blNo} Date: ${formatDate(form.blDate)}`],
         ["MASTER BL NO", ":", form.masterBlNo],
-        ["Container No(s)", ":", `${form.containerNo} ${form.containerCount}x${form.containerType}FT`],
+        [
+          "Container No(s)",
+          ":",
+          form.containers.map(c => `${c.number} (${c.type}ft)`).join("\n") // ⬅️ stack vertically
+        ],
         ["Consignee", ":", form.consignee],
         ["Cargo Description", ":", form.cargoDesc],
         ["Delivery", ":", form.delivery],
@@ -195,8 +233,8 @@ export default function App() {
           valign: "middle", // vertical center
         },
         columnStyles: {
-          0: { fontStyle: "bold", cellWidth: 45, halign: "left", valign: "middle" },
-          1: { cellWidth: 5, halign: "center", valign: "middle" },
+          0: { fontStyle: "bold", cellWidth: 45, halign: "left", valign: "top" },
+          1: { cellWidth: 5, halign: "center", valign: "top" },
           2: { cellWidth: 120, halign: "left", valign: "middle" },
         },
         body: rows,
@@ -264,14 +302,14 @@ export default function App() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: "easeOut" }}>
         <Container sx={{ mt: 4, mb: 6 }}>
           {/* ---- Form ---- */}
-          <Paper sx={{ p: 3, mb: 4, borderRadius: 5,boxShadow: "rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;" }}>
-            <Typography sx={{ fontWeight: "bold",color: '#003366',textShadow: "1px 1px 2px rgba(0,0,0,0.2)"}} variant="h4" align="start" mb={8}>
+          <Paper sx={{ p: 3, mb: 4, borderRadius: 5, boxShadow: "rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;" }}>
+            <Typography sx={{ fontWeight: "bold", color: '#003366', textShadow: "1px 1px 2px rgba(0,0,0,0.2)" }} variant="h4" align="start" mb={8}>
               SREE EXIM SOLUTIONS
             </Typography>
 
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-                <Typography variant="h4" sx={{ minWidth: 250, fontWeight: 'bold',color: '#006666',textShadow: "1px 1px 2px rgba(0,0,0,0.2)"}}>WELCOME <span className="loop-arrow"><ChevronRight /></span></Typography>
+                <Typography variant="h4" sx={{ minWidth: 250, fontWeight: 'bold', color: '#006666', textShadow: "1px 1px 2px rgba(0,0,0,0.2)" }}>WELCOME <span className="loop-arrow"><ChevronRight /></span></Typography>
               </Grid>
 
               <Grid item xs={12}>
@@ -304,22 +342,48 @@ export default function App() {
                 <TextField sx={{ minWidth: 250 }} label="Master BL No" name="masterBlNo" value={form.masterBlNo} onChange={handleChange} fullWidth required />
               </Grid>
 
+              {/* No. of Containers */}
               <Grid item xs={12} sm={6}>
-                <TextField sx={{ minWidth: 250 }} label="No. of Container" name="containerCount" value={form.containerCount} onChange={handleChange} fullWidth required />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField sx={{ minWidth: 250 }} label="Container No(s)" name="containerNo" value={form.containerNo} onChange={handleChange} fullWidth required />
+              <TextField
+  sx={{ minWidth: 250 }}
+  type="number"
+  label="No. of Container"
+  value={containerCountInput}
+  onChange={handleContainerCountChange}
+  fullWidth
+  required
+  inputProps={{ min: 1 }}
+/>
+
               </Grid>
 
-              <Grid item xs={12} sm={6}>
-                <Autocomplete
-                  freeSolo
-                  options={containerTypes}
-                  inputValue={form.containerType}
-                  onInputChange={(_, newValue) => setForm((p) => ({ ...p, containerType: (newValue || "").toUpperCase() }))}
-                  renderInput={(params) => <TextField sx={{ minWidth: 250 }} {...params} label="Container Type" fullWidth required />}
-                />
-              </Grid>
+              {/* Dynamic Container Inputs */}
+              {form.containers.map((container, idx) => (
+                <React.Fragment key={idx}>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      sx={{ minWidth: 250 }}
+                      label={`Container No ${idx + 1}`}
+                      value={container.number}
+                      onChange={(e) => handleContainerChange(idx, "number", e.target.value)}
+                      fullWidth
+                      required
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Autocomplete
+                      freeSolo
+                      options={containerTypes}
+                      inputValue={container.type}
+                      onInputChange={(_, newValue) => handleContainerChange(idx, "type", newValue || "")}
+                      renderInput={(params) => (
+                        <TextField {...params} sx={{ minWidth: 250 }} label={`Container Type ${idx + 1}`} fullWidth required />
+                      )}
+                    />
+                  </Grid>
+                </React.Fragment>
+              ))}
+
 
               <Grid item xs={12} sm={6}>
                 <TextField sx={{ minWidth: 250 }} label="Consignee" name="consignee" value={form.consignee} onChange={handleChange} fullWidth required />
@@ -425,7 +489,7 @@ export default function App() {
               {[
                 ["BL NO", `${form.blNo}  Date: ${formatDate(form.blDate)}`],
                 ["MASTER BL NO", form.masterBlNo],
-                ["Container No(s)", `${form.containerNo} ${form.containerCount}x${form.containerType}FT`],
+                ["Container No(s)", form.containers.map(c => `${c.number} (${c.type}ft)`).join(", ")],
                 ["Consignee", form.consignee],
                 ["Cargo Description", form.cargoDesc],
                 ["Delivery", form.delivery],
