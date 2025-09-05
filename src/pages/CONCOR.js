@@ -18,7 +18,8 @@ import {
 } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
+
+import logoBase64 from "../components/Demo"; // <-- put your base64 logo here
 
 const theme = createTheme({
   palette: {
@@ -39,6 +40,7 @@ export default function CONCOR() {
     shippingLine: "",
     containerNo: "",
     importAppDate: "",
+    importAppTime: "",
     cargoType: "",
     weight: "",
     packages: "",
@@ -68,50 +70,108 @@ export default function CONCOR() {
     try {
       const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
 
-      doc.setFont("helvetica", "bold");
+      // ---- Header with Logo ----
+      try {
+        if (logoBase64) {
+          doc.addImage(logoBase64, "PNG", 10, 8, 25, 25);
+        }
+      } catch (err) {
+        console.warn("Logo not added:", err);
+      }
+
+      doc.setFont("times", "bold");
+      doc.setFontSize(12);
+      doc.text("FORM No. WFD / F / 040", 200, 15, { align: "right" });
+
       doc.setFontSize(16);
-      doc.text("CONCOR IMPORT APPLICATION FORM", 105, 15, { align: "center" });
-      doc.line(10, 20, 200, 20);
+      doc.text("CONTAINER CORPORATION OF INDIA LTD.", 105, 20, { align: "center" });
 
-      const rows = [
-        ["Importer Name", form.importerName],
-        ["Importer GST No.", form.importerGST],
-        ["CHA Name", form.chaName],
-        ["Bill of Entry No.", form.boeNo],
-        ["Bill of Entry Date", formatDate(form.boeDate)],
-        ["Shipping Line", form.shippingLine],
-        ["Container No.", form.containerNo],
-        ["Import App. Date", formatDate(form.importAppDate)],
-        ["Cargo Type", form.cargoType],
-        ["Weight", `${form.weight} KGS`],
-        ["No. of Packages", `${form.packages} PKG`],
-        ["LCL / FCL", form.lclFcl],
-        ["Delivery Type", form.deliveryType],
-        ["Vehicle", form.vehicle],
-        ["Equipment Required", form.equipment],
-        ["Payment Mode", form.paymentMode],
-      ];
-
-      autoTable(doc, {
-        startY: 25,
-        theme: "grid",
-        styles: { fontSize: 11, cellPadding: 3, valign: "middle" },
-        headStyles: { fillColor: [25, 118, 210] },
-        columnStyles: {
-          0: { fontStyle: "bold", cellWidth: 70 },
-          1: { cellWidth: 110 },
-        },
-        body: rows,
-      });
-
-      let y = doc.lastAutoTable.finalY + 15;
-      doc.setFontSize(10);
+      doc.setFontSize(12);
+      doc.setFont("times", "normal");
       doc.text(
-        "(This is a computer-generated document and does not require a signature.)",
+        "INLAND CONTAINER DEPOT., WHITEFIELD, BANGALORE - 560 066",
         105,
-        y,
+        27,
         { align: "center" }
       );
+
+      doc.setLineWidth(0.3);
+      doc.line(10, 36, 200, 36);
+
+      let y = 45;
+      const lineGap = 8;
+
+      doc.setFont("times", "normal");
+      doc.setFontSize(12);
+
+      doc.text("1. a) Name of Importer :", 15, y);
+      doc.text(form.importerName || "", 90, y);
+      y += lineGap;
+
+      doc.text("   b) Name & GST No. (for invoice) :", 15, y);
+      doc.text(form.importerGST || "", 90, y);
+      y += lineGap;
+
+      doc.text("2. Name of CHA :", 15, y);
+      doc.text(form.chaName || "", 90, y);
+      y += lineGap;
+
+      doc.text("3. Bill of Entry No. & Date :", 15, y);
+      doc.text(`${form.boeNo || ""}   ${formatDate(form.boeDate)}`, 90, y);
+      y += lineGap;
+
+      doc.text("4. Shipping Line :", 15, y);
+      doc.text(form.shippingLine || "", 90, y);
+      y += lineGap;
+
+      doc.text("5. Container No. :", 15, y);
+      doc.text(form.containerNo || "", 90, y);
+      y += lineGap;
+
+      doc.text("   Import Application Date & Time :", 15, y);
+      doc.text(
+        `${formatDate(form.importAppDate)} ${form.importAppTime || ""}`,
+        90,
+        y
+      );
+      y += lineGap;
+
+      doc.text("6. Cargo Details (Haz/Non-Haz) :", 15, y);
+      doc.text(form.cargoType || "", 90, y);
+      y += lineGap;
+
+      doc.text("7. Weight :", 15, y);
+      doc.text(`${form.weight} KGS`, 90, y);
+      y += lineGap;
+
+      doc.text("8. No. of Packages :", 15, y);
+      doc.text(form.packages || "", 90, y);
+      y += lineGap;
+
+      doc.text("9. LCL / FCL :", 15, y);
+      doc.text(form.lclFcl || "", 90, y);
+      y += lineGap;
+
+      doc.text("10. Type of Delivery (WH/Direct/Outside) :", 15, y);
+      doc.text(form.deliveryType || "", 110, y);
+      y += lineGap;
+
+      doc.text("11. Vehicle (Lorry/Tempo/Trailer) :", 15, y);
+      doc.text(form.vehicle || "", 110, y);
+      y += lineGap;
+
+      doc.text("12. Equipment Required (Fork/Crane/Manual) :", 15, y);
+      doc.text(form.equipment || "", 130, y);
+      y += lineGap;
+
+      doc.text("13. Charges Payment Mode :", 15, y);
+      doc.text(form.paymentMode || "", 90, y);
+      y += lineGap * 3;
+
+      // ---- Footer ----
+      doc.text("for __________________________", 190, y, { align: "right" });
+      y += lineGap;
+      doc.text("Signature of the Applicant", 190, y, { align: "right" });
 
       doc.save("Concor_Import_Application.pdf");
       setOpenToast(true);
@@ -142,22 +202,69 @@ export default function CONCOR() {
             </Typography>
 
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}><TextField sx={{ minWidth: 250 }} label="Importer Name" name="importerName" value={form.importerName} onChange={handleChange} fullWidth required /></Grid>
-              <Grid item xs={12} sm={6}><TextField sx={{ minWidth: 250 }} label="Importer GST No." name="importerGST" value={form.importerGST} onChange={handleChange} fullWidth required /></Grid>
-              <Grid item xs={12}><TextField sx={{ minWidth: 250 }} label="CHA Name" name="chaName" value={form.chaName} onChange={handleChange} fullWidth required /></Grid>
-              <Grid item xs={12} sm={6}><TextField sx={{ minWidth: 250 }} label="Bill of Entry No." name="boeNo" value={form.boeNo} onChange={handleChange} fullWidth required /></Grid>
-              <Grid item xs={12} sm={6}><TextField sx={{ minWidth: 250 }} type="date" label="Bill of Entry Date" name="boeDate" value={form.boeDate} onChange={handleChange} InputLabelProps={{ shrink: true }} fullWidth required /></Grid>
-              <Grid item xs={12}><TextField sx={{ minWidth: 250 }} label="Shipping Line" name="shippingLine" value={form.shippingLine} onChange={handleChange} fullWidth required /></Grid>
-              <Grid item xs={12} sm={6}><TextField sx={{ minWidth: 250 }} label="Container No." name="containerNo" value={form.containerNo} onChange={handleChange} fullWidth required /></Grid>
-              <Grid item xs={6} sm={3}><TextField sx={{ minWidth: 250 }} type="date" label="Import App. Date" name="importAppDate" value={form.importAppDate} onChange={handleChange} InputLabelProps={{ shrink: true }} fullWidth /></Grid>
-              <Grid item xs={12} sm={6}><TextField sx={{ minWidth: 250 }} select label="Cargo Type" name="cargoType" value={form.cargoType} onChange={handleChange} fullWidth required>{cargoOptions.map((o,i)=><MenuItem key={i} value={o}>{o}</MenuItem>)}</TextField></Grid>
-              <Grid item xs={12} sm={6}><TextField sx={{ minWidth: 250 }} label="Weight" name="weight" value={form.weight} onChange={handleChange} fullWidth required /></Grid>
-              <Grid item xs={12} sm={6}><TextField sx={{ minWidth: 250 }} label="No. of Packages" name="packages" value={form.packages} onChange={handleChange} fullWidth required /></Grid>
-              <Grid item xs={12} sm={6}><TextField sx={{ minWidth: 250 }} select label="LCL / FCL" name="lclFcl" value={form.lclFcl} onChange={handleChange} fullWidth required>{lclFclOptions.map((o,i)=><MenuItem key={i} value={o}>{o}</MenuItem>)}</TextField></Grid>
-              <Grid item xs={12} sm={6}><TextField sx={{ minWidth: 250 }} select label="Delivery Type" name="deliveryType" value={form.deliveryType} onChange={handleChange} fullWidth required>{deliveryOptions.map((o,i)=><MenuItem key={i} value={o}>{o}</MenuItem>)}</TextField></Grid>
-              <Grid item xs={12} sm={6}><TextField sx={{ minWidth: 250 }} select label="Vehicle" name="vehicle" value={form.vehicle} onChange={handleChange} fullWidth required>{vehicleOptions.map((o,i)=><MenuItem key={i} value={o}>{o}</MenuItem>)}</TextField></Grid>
-              <Grid item xs={12} sm={6}><TextField sx={{ minWidth: 250 }} select label="Equipment Required" name="equipment" value={form.equipment} onChange={handleChange} fullWidth required>{equipmentOptions.map((o,i)=><MenuItem key={i} value={o}>{o}</MenuItem>)}</TextField></Grid>
-              <Grid item xs={12}><TextField sx={{ minWidth: 250 }} select label="Payment Mode" name="paymentMode" value={form.paymentMode} onChange={handleChange} fullWidth required>{paymentOptions.map((o,i)=><MenuItem key={i} value={o}>{o}</MenuItem>)}</TextField></Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField type="date" label="Import App Date" name="importAppDate" value={form.importAppDate} onChange={handleChange} InputLabelProps={{ shrink: true }} fullWidth />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField label="Import App Time" name="importAppTime" value={form.importAppTime} onChange={handleChange} fullWidth />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField label="Importer Name" name="importerName" value={form.importerName} onChange={handleChange} fullWidth required />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField label="Importer GST No." name="importerGST" value={form.importerGST} onChange={handleChange} fullWidth required />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField label="CHA Name" name="chaName" value={form.chaName} onChange={handleChange} fullWidth required />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField label="Bill of Entry No." name="boeNo" value={form.boeNo} onChange={handleChange} fullWidth required />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField type="date" label="Bill of Entry Date" name="boeDate" value={form.boeDate} onChange={handleChange} InputLabelProps={{ shrink: true }} fullWidth required />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField label="Shipping Line" name="shippingLine" value={form.shippingLine} onChange={handleChange} fullWidth required />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField label="Container No." name="containerNo" value={form.containerNo} onChange={handleChange} fullWidth required />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField select label="Cargo Type" name="cargoType" value={form.cargoType} onChange={handleChange} fullWidth required>
+                  {cargoOptions.map((o, i) => <MenuItem key={i} value={o}>{o}</MenuItem>)}
+                </TextField>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField label="Weight (KGS)" name="weight" value={form.weight} onChange={handleChange} fullWidth required />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField label="No. of Packages" name="packages" value={form.packages} onChange={handleChange} fullWidth required />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField select label="LCL / FCL" name="lclFcl" value={form.lclFcl} onChange={handleChange} fullWidth required>
+                  {lclFclOptions.map((o, i) => <MenuItem key={i} value={o}>{o}</MenuItem>)}
+                </TextField>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField select label="Delivery Type" name="deliveryType" value={form.deliveryType} onChange={handleChange} fullWidth required>
+                  {deliveryOptions.map((o, i) => <MenuItem key={i} value={o}>{o}</MenuItem>)}
+                </TextField>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField select label="Vehicle" name="vehicle" value={form.vehicle} onChange={handleChange} fullWidth required>
+                  {vehicleOptions.map((o, i) => <MenuItem key={i} value={o}>{o}</MenuItem>)}
+                </TextField>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField select label="Equipment Required" name="equipment" value={form.equipment} onChange={handleChange} fullWidth required>
+                  {equipmentOptions.map((o, i) => <MenuItem key={i} value={o}>{o}</MenuItem>)}
+                </TextField>
+              </Grid>
+              <Grid item xs={12}>
+                <TextField select label="Payment Mode" name="paymentMode" value={form.paymentMode} onChange={handleChange} fullWidth required>
+                  {paymentOptions.map((o, i) => <MenuItem key={i} value={o}>{o}</MenuItem>)}
+                </TextField>
+              </Grid>
             </Grid>
           </Paper>
 
@@ -231,4 +338,3 @@ export default function CONCOR() {
     </ThemeProvider>
   );
 }
-
