@@ -22,7 +22,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import logoBase64 from "../components/Demo";
 import "../style.css";
-import { ChevronRight } from "@mui/icons-material";
+
 
 const theme = createTheme({
   palette: {
@@ -66,9 +66,9 @@ export default function DOFORM() {
   const handleContainerCountChange = (e) => {
     const value = e.target.value;
     setContainerCountInput(value); // let the user type freely
-  
+
     const count = parseInt(value, 10);
-  
+
     if (!isNaN(count) && count > 0) {
       setForm((prev) => {
         let newContainers = [...prev.containers];
@@ -83,7 +83,7 @@ export default function DOFORM() {
       });
     }
   };
-  
+
 
   // When individual container No/Type changes
   const handleContainerChange = (index, field, value) => {
@@ -130,14 +130,14 @@ export default function DOFORM() {
       "measurement",
       "validTill",
     ];
-    
+
     const missing = required.filter((k) => !form[k]);
     const missingContainers = form.containers.some(c => !c.number || !c.type);
-    
+
     if (missing.length || missingContainers) {
       alert("Please fill all required fields before downloading the PDF.");
       return;
-    }    
+    }
 
     setIsDownloading(true);
     try {
@@ -291,7 +291,7 @@ export default function DOFORM() {
     "ENNORE CARGO CONTAINER TERMINAL PVT LTD,\nCHENNAI",
   ];
 
-  const containerTypes = ["20", "40", "20HC", "40HC", "45", "LCL"];
+  const containerTypes = ["20", "40", "20HC", "40HC","20GP", "40GP"];
   const packageTypes = [
     "BDL", "BGS", "BLK", "BLS", "BOX", "BRL", "BUL", "CAN", "CAS", "CHT", "CLS", "COL", "CRT", "CSK", "CTN", "CYL", "DRM", "EVN", "FLK", "FUT", "HBK", "JBL", "JTA", "KEG", "LFT", "LOG", "NGT", "PAL", "PCS", "PKG", "PLT", "QDS", "REL", "RLS", "SHT", "SKD", "SLB", "TSL", "TIN", "TRK", "UNT"
   ];
@@ -303,14 +303,11 @@ export default function DOFORM() {
         <Container sx={{ mt: 4, mb: 6 }}>
           {/* ---- Form ---- */}
           <Paper sx={{ p: 3, mb: 4, borderRadius: 5, boxShadow: "rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;" }}>
-            <Typography sx={{ fontWeight: "bold", color: '#003366', textShadow: "1px 1px 2px rgba(0,0,0,0.2)" }} variant="h4" align="start" mb={8}>
-              SREE EXIM SOLUTIONS
+            <Typography sx={{ fontWeight: "bold", color: '#091322', textShadow: "1px 1px 2px rgba(0,0,0,0.2)" }} variant="h4" align="start" mb={8}>
+              Delivery Order
             </Typography>
 
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <Typography variant="h4" sx={{ minWidth: 250, fontWeight: 'bold', color: '#006666', textShadow: "1px 1px 2px rgba(0,0,0,0.2)" }}>WELCOME <span className="loop-arrow"><ChevronRight /></span></Typography>
-              </Grid>
 
               <Grid item xs={12}>
                 <TextField
@@ -330,10 +327,10 @@ export default function DOFORM() {
               </Grid>
 
               <Grid item xs={12} sm={6}>
-                <TextField sx={{ minWidth: 250 }} type="date" label="Date" name="doDate" value={form.doDate} onChange={handleChange} fullWidth InputLabelProps={{ shrink: true }} required />
+                <TextField sx={{ minWidth: 250 }} type="date" label="DO Date" name="doDate" value={form.doDate} onChange={handleChange} fullWidth InputLabelProps={{ shrink: true }} required />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField sx={{ minWidth: 250 }} label="BL No" name="blNo" value={form.blNo} onChange={handleChange} fullWidth required />
+                <TextField sx={{ minWidth: 250 }} label="HBL No" name="blNo" value={form.blNo} onChange={handleChange} fullWidth required />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField sx={{ minWidth: 250 }} type="date" label="BL Date" name="blDate" value={form.blDate} onChange={handleChange} fullWidth InputLabelProps={{ shrink: true }} required />
@@ -344,16 +341,16 @@ export default function DOFORM() {
 
               {/* No. of Containers */}
               <Grid item xs={12} sm={6}>
-              <TextField
-  sx={{ minWidth: 250 }}
-  type="number"
-  label="No. of Container"
-  value={containerCountInput}
-  onChange={handleContainerCountChange}
-  fullWidth
-  required
-  inputProps={{ min: 1 }}
-/>
+                <TextField
+                  sx={{ minWidth: 250 }}
+                  type="number"
+                  label="No. of Container"
+                  value={containerCountInput}
+                  onChange={handleContainerCountChange}
+                  fullWidth
+                  required
+                  inputProps={{ min: 1 }}
+                />
 
               </Grid>
 

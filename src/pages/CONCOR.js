@@ -48,7 +48,8 @@ export default function CONCOR() {
     deliveryType: "",
     vehicle: "",
     equipment: "",
-    paymentMode: "",
+    accountNo: "123456789",
+    acName:"SREE EXIM SOLUTIONS"
   });
 
   const [openToast, setOpenToast] = useState(false);
@@ -56,7 +57,7 @@ export default function CONCOR() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    setForm({ ...form, [name]: value.toUpperCase() });
   };
 
   const formatDate = (date) => {
@@ -106,76 +107,54 @@ export default function CONCOR() {
       // ---- Body ----
       let y = 65;
       const lineGap = 8;
-      doc.setFont("times", "normal");
-      doc.setFontSize(12);
+      const labelX = 15;
+      const colonX = 85;
+      const valueX = 95;
   
-      doc.text("1. a) NAME OF THE IMPORTER :", 15, y);
-      doc.text(form.importerName || "", 90, y);
-      y += lineGap;
+      // helper to add rows
+      const addRow = (label, value = "", showColon = true) => {
+        doc.text(label, labelX, y);
   
-      doc.text("   b) Name & GST No. Details for", 15, y);
-      doc.text(form.importerGST || "", 90, y);
-      y += lineGap;
-      doc.text("      which invoice to be generated", 15, y);
-      y += lineGap;
+        if (showColon) {
+          doc.text(":", colonX, y);
+          doc.text(value || "", valueX, y);
+        } else if (value) {
+          // if a value exists but colon is hidden → print value at colonX
+          doc.text(value, colonX, y);
+        }
+        y += lineGap;
+      };
   
-      doc.text("2. NAME OF CHA :", 15, y);
-      doc.text(form.chaName || "", 90, y);
-      y += lineGap;
-  
-      doc.text("3. BILL OF ENTRY NO. & DATE :", 15, y);
-      doc.text(`${form.boeNo || ""}   ${formatDate(form.boeDate)}`, 90, y);
-      y += lineGap;
-  
-      doc.text("4. SHIPPING LINE :", 15, y);
-      doc.text(form.shippingLine || "", 90, y);
-      y += lineGap;
-  
-      doc.text("5. CONTAINER NO. :", 15, y);
-      doc.text(form.containerNo || "", 90, y);
-      y += lineGap;
-  
-      doc.text("6. CARGO DETAILS :", 15, y);
-      doc.text(form.cargoType || "", 90, y);
-      y += lineGap;
-      doc.text("  (HAZARDOUS / NON-HAZARDOUS) :", 15, y);
-      y += lineGap;
-  
-      doc.text("7. WEIGHT :", 15, y);
-      doc.text(`${form.weight || ""} KGS`, 90, y);
-      y += lineGap;
-  
-      doc.text("8. NO. OF PKGS :", 15, y);
-      doc.text(`${form.packages || ""} PKG`, 90, y);
-      y += lineGap;
-  
-      doc.text("9. LCL / FCL :", 15, y);
-      doc.text(form.lclFcl || "", 90, y);
-      y += lineGap;
-  
-      doc.text("10. TYPE OF DELIVERY (WH / DIRECT / OUTSIDE) :", 15, y);
-      doc.text(form.deliveryType || "", 120, y);
-      y += lineGap;
-  
-      doc.text("11. VEHICLE (LORRY / TEMPO / TRAILER) :", 15, y);
-      doc.text(form.vehicle || "", 120, y);
-      y += lineGap;
-  
-      doc.text("12. DETAILS OF EQUIPMENT REQUIRED :", 15, y);
-      doc.text(form.equipment || "", 130, y);
-      y += lineGap;
-      doc.text("   (FORK / CRANE / MANUAL) :", 15, y);
-      y += lineGap;
-  
-      doc.text("13. THE CHARGES FOR ABOVE ACTIVITY PAID BY CASH / DD / PDA A/c :", 15, y);
-      y += lineGap;
-      doc.text("    CODE", 15, y);
-      doc.text(form.paymentMode || "", 120, y);
-      y += lineGap * 3;
+      // ---- Rows ----
+      addRow("1. a) NAME OF THE IMPORTER", form.importerName);
+      addRow("   b) GST No. (Invoice Purpose)", form.importerGST);
+      addRow("2. NAME OF CHA", form.chaName);
+      addRow("3. BILL OF ENTRY NO. & DATE", `${form.boeNo || ""}   ${formatDate(form.boeDate)}`);
+      addRow("4. SHIPPING LINE", form.shippingLine);
+      addRow("5. CONTAINER NO.", form.containerNo);
+      addRow("6. CARGO DETAILS", form.cargoType);
+      addRow("   (Hazardous / Non-Hazardous)", "", false);
+      addRow("7. WEIGHT", `${form.weight || ""} KGS`);
+      addRow("8. NO. OF PKGS", `${form.packages || ""} PKG`);
+      addRow("9. LCL / FCL", form.lclFcl);
+      addRow("10. TYPE OF DELIVERY", form.deliveryType);
+      addRow("    (WH / DIRECT / OUTSIDE)", "", false);
+      addRow("11. VEHICLE", form.vehicle);
+      addRow("    (LORRY / TEMPO / TRAILER)", "", false);
+      addRow("12. EQUIPMENT REQUIRED", form.equipment);
+      addRow("    (Fork / Crane / Manual)", "", false);
+      addRow("13. PAYMENT MODE", form.accountNo);
+      addRow("    (Cash / DD / PDA A/c)", "", false);
+
+      doc.setFont("times", "bold");
+doc.setFontSize(12);
+doc.text("CODE", 20, y, { align: "left" });
+doc.text(`OF M/S. ${form.acName || ""}`, 80, y);
   
       // ---- Footer ----
+      y += lineGap * 2;
       doc.text("for", 190, y, { align: "right" });
-      y += lineGap;
+      y += lineGap * 2;
       doc.text("Signature of the Applicant", 190, y, { align: "right" });
   
       // Save PDF
@@ -189,14 +168,13 @@ export default function CONCOR() {
     }
   };
   
-  
 
-  const cargoOptions = ["Hazardous", "Non-Hazardous"];
+  const cargoOptions = ["HAZARDOUS", "NON-HAZARDOUS"];
   const lclFclOptions = ["LCL", "FCL"];
-  const deliveryOptions = ["WH", "Direct", "Outside"];
-  const vehicleOptions = ["Lorry", "Tempo", "Trailer"];
-  const equipmentOptions = ["Fork", "Crane", "Manual", "Kalmar"];
-  const paymentOptions = ["Cash", "DD", "PDA A/c"];
+  const deliveryOptions = ["ICD DESTUFF", "FACTORY DESTUFF",];
+  const vehicleOptions = ["LORRY", "TEMPO", "TRAILER"];
+  const equipmentOptions = ["FORK", "CRANE", "MANUAL", "KALMAR"];
+ 
 
   return (
     <ThemeProvider theme={theme}>
@@ -211,69 +189,86 @@ export default function CONCOR() {
 
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-                <TextField type="date" label="Import App Date" name="importAppDate" value={form.importAppDate} onChange={handleChange} InputLabelProps={{ shrink: true }} fullWidth />
+                <TextField sx={{ minWidth: 250 }} type="date" label="Date" name="importAppDate" value={form.importAppDate} onChange={handleChange} InputLabelProps={{ shrink: true }} fullWidth />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField label="Importer Name" name="importerName" value={form.importerName} onChange={handleChange} fullWidth required />
+                <TextField sx={{ minWidth: 250 }} label="Importer Name" name="importerName" value={form.importerName} onChange={handleChange} fullWidth required />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField label="Importer GST No." name="importerGST" value={form.importerGST} onChange={handleChange} fullWidth required />
+                <TextField sx={{ minWidth: 250 }} label="GST No." name="importerGST" value={form.importerGST} onChange={handleChange} fullWidth required />
               </Grid>
               <Grid item xs={12}>
-                <TextField label="CHA Name" name="chaName" value={form.chaName} onChange={handleChange} fullWidth required />
+                <TextField sx={{ minWidth: 250 }} label="CHA Name" name="chaName" value={form.chaName} onChange={handleChange} fullWidth required />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField label="Bill of Entry No." name="boeNo" value={form.boeNo} onChange={handleChange} fullWidth required />
+                <TextField sx={{ minWidth: 250 }} label="Bill of Entry No." name="boeNo" value={form.boeNo} onChange={handleChange} fullWidth required />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField type="date" label="Bill of Entry Date" name="boeDate" value={form.boeDate} onChange={handleChange} InputLabelProps={{ shrink: true }} fullWidth required />
+                <TextField sx={{ minWidth: 250 }} type="date" label="Bill of Entry Date" name="boeDate" value={form.boeDate} onChange={handleChange} InputLabelProps={{ shrink: true }} fullWidth required />
               </Grid>
               <Grid item xs={12}>
-                <TextField label="Shipping Line" name="shippingLine" value={form.shippingLine} onChange={handleChange} fullWidth required />
+                <TextField sx={{ minWidth: 250 }} label="Shipping Line" name="shippingLine" value={form.shippingLine} onChange={handleChange} fullWidth required />
               </Grid>
               <Grid item xs={12}>
-                <TextField label="Container No." name="containerNo" value={form.containerNo} onChange={handleChange} fullWidth required />
+                <TextField sx={{ minWidth: 250 }} label="Container No." name="containerNo" value={form.containerNo} onChange={handleChange} fullWidth required />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField select label="Cargo Type" name="cargoType" value={form.cargoType} onChange={handleChange} fullWidth required>
+                <TextField sx={{ minWidth: 250 }} select label="Cargo Type" name="cargoType" value={form.cargoType} onChange={handleChange} fullWidth required>
                   {cargoOptions.map((o, i) => <MenuItem key={i} value={o}>{o}</MenuItem>)}
                 </TextField>
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField label="Weight (KGS)" name="weight" value={form.weight} onChange={handleChange} fullWidth required />
+                <TextField sx={{ minWidth: 250 }} label="Weight (KGS)" name="weight" value={form.weight} onChange={handleChange} fullWidth required />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField label="No. of Packages" name="packages" value={form.packages} onChange={handleChange} fullWidth required />
+                <TextField sx={{ minWidth: 250 }} label="No. of Packages" name="packages" value={form.packages} onChange={handleChange} fullWidth required />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField select label="LCL / FCL" name="lclFcl" value={form.lclFcl} onChange={handleChange} fullWidth required>
+                <TextField sx={{ minWidth: 250 }} select label="LCL / FCL" name="lclFcl" value={form.lclFcl} onChange={handleChange} fullWidth required>
                   {lclFclOptions.map((o, i) => <MenuItem key={i} value={o}>{o}</MenuItem>)}
                 </TextField>
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField select label="Delivery Type" name="deliveryType" value={form.deliveryType} onChange={handleChange} fullWidth required>
+                <TextField sx={{ minWidth: 250 }} select label="Delivery Type" name="deliveryType" value={form.deliveryType} onChange={handleChange} fullWidth required>
                   {deliveryOptions.map((o, i) => <MenuItem key={i} value={o}>{o}</MenuItem>)}
                 </TextField>
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField select label="Vehicle" name="vehicle" value={form.vehicle} onChange={handleChange} fullWidth required>
+                <TextField sx={{ minWidth: 250 }} select label="Vehicle" name="vehicle" value={form.vehicle} onChange={handleChange} fullWidth required>
                   {vehicleOptions.map((o, i) => <MenuItem key={i} value={o}>{o}</MenuItem>)}
                 </TextField>
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField select label="Equipment Required" name="equipment" value={form.equipment} onChange={handleChange} fullWidth required>
+                <TextField sx={{ minWidth: 250 }} select label="Equipment Required" name="equipment" value={form.equipment} onChange={handleChange} fullWidth required>
                   {equipmentOptions.map((o, i) => <MenuItem key={i} value={o}>{o}</MenuItem>)}
                 </TextField>
               </Grid>
               <Grid item xs={12}>
-                <TextField select label="Payment Mode" name="paymentMode" value={form.paymentMode} onChange={handleChange} fullWidth required>
-                  {paymentOptions.map((o, i) => <MenuItem key={i} value={o}>{o}</MenuItem>)}
-                </TextField>
-              </Grid>
+  <TextField
+    sx={{ minWidth: 250 }}
+    label="Account no"
+    name="accountNo"
+    value={form.accountNo}
+    onChange={handleChange}
+    fullWidth
+    required
+  />
+</Grid>
+<Grid item xs={12}>
+  <TextField
+    sx={{ minWidth: 250 }}
+    label="Account Holder"
+    name="acName"
+    value={form.acName}
+    onChange={handleChange}
+    fullWidth
+    required
+  />
+</Grid>
             </Grid>
           </Paper>
 
-          {/* --- Preview --- */}
+          {/* --- Preview ---
           <Paper sx={{ p: 4, borderRadius: 4, mb: 4 }}>
             <Typography variant="h6" align="center" gutterBottom><strong>Preview</strong></Typography>
             <Divider sx={{ my: 2 }} />
@@ -287,7 +282,6 @@ export default function CONCOR() {
                 ["Shipping Line", form.shippingLine],
                 ["Container No.", form.containerNo],
                 ["Import App. Date", formatDate(form.importAppDate)],
-                ["Import App. Time", form.importAppTime],
                 ["Cargo Type", form.cargoType],
                 ["Weight", form.weight],
                 ["No. of Packages", form.packages],
@@ -295,7 +289,7 @@ export default function CONCOR() {
                 ["Delivery Type", form.deliveryType],
                 ["Vehicle", form.vehicle],
                 ["Equipment Required", form.equipment],
-                ["Payment Mode", form.paymentMode],
+                ["Account No", form.accountNo],
               ].map(([label, value], i) => (
                 <React.Fragment key={i}>
                   <Typography sx={{ fontWeight: 600 }}>{label}</Typography>
@@ -304,7 +298,7 @@ export default function CONCOR() {
                 </React.Fragment>
               ))}
             </Box>
-          </Paper>
+          </Paper> */}
 
           <Box display="flex" justifyContent="center">
             <Button

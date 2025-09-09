@@ -1,81 +1,116 @@
-import React from "react";
-import { AppBar, Tabs, Tab, Toolbar, Typography, Box } from "@mui/material";
+import React, { useRef, useLayoutEffect, useState } from "react";
+import { AppBar, Toolbar, Typography, Box, Button } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 
 export default function Navbar() {
   const location = useLocation();
+  const tabs = [
+    { label: "HOME", path: "/" },
+    { label: "DOFORM", path: "/doform" },
+    { label: "CONCOR", path: "/concor" },
+  ];
 
-  // Match route with tab index
-  let currentTab = 0;
-  if (location.pathname === "/doform") currentTab = 1;
-  if (location.pathname === "/concor") currentTab = 2;
+  // Active tab index
+  const currentTab = tabs.findIndex((t) => t.path === location.pathname) ?? 0;
+
+  // Refs for measuring underline position
+  const containerRef = useRef(null);
+  const tabRefs = useRef([]);
+  const [indicator, setIndicator] = useState({ left: 0, width: 0 });
+
+  useLayoutEffect(() => {
+    const node = tabRefs.current[currentTab];
+    const container = containerRef.current;
+    if (node && container) {
+      const cRect = container.getBoundingClientRect();
+      const nRect = node.getBoundingClientRect();
+      setIndicator({
+        left: nRect.left - cRect.left,
+        width: nRect.width,
+      });
+    }
+  }, [currentTab, location.pathname]);
+
+  const HIGHLIGHT = "#AD241B";
 
   return (
     <AppBar
-      position="static"
+      position="sticky"
+      elevation={2}
       sx={{
-        backgroundColor: "#fff", // White background
-        color: "#000", // Black text
-        boxShadow: 1,
+        backgroundColor: "#fff",
+        color: "#000",
+        borderBottom: "1px solid #e0e0e0",
       }}
     >
-      <Toolbar>
-        <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: "bold" }}>
+      <Toolbar
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          px: { xs: 2, sm: 4 },
+        }}
+      >
+        {/* Brand */}
+        <Typography
+          variant="h6"
+          sx={{
+            fontWeight: 700,
+            color: "#000",
+            letterSpacing: 0.5,
+          }}
+        >
           SREE EXIM SOLUTIONS
         </Typography>
 
-        <Tabs
-          value={currentTab}
-          textColor="inherit"
-          TabIndicatorProps={{ style: { display: "none" } }} // hide default indicator
-          sx={{
-            "& .MuiTab-root": {
-              color: "#000",
-              minWidth: "auto",
-              px: 2,
-              fontWeight: "normal",
-              transition: "color 0.2s ease-in-out",
-              position: "relative",
-            },
-            "& .Mui-selected": {
-              fontWeight: "bold",
-              color: "#000",
-            },
-            "& .MuiTab-root:hover": {
-              color: "#333",
-              textDecoration: "underline",
-            },
-          }}
-        >
-          <Tab label="HOME" component={Link} to="/" />
-          <Tab label="DOFORM" component={Link} to="/doform" />
-          <Tab label="CONCOR" component={Link} to="/concor" />
-        </Tabs>
-
-        {/* Custom animated indicator */}
+        {/* Tabs */}
         <Box
-          sx={{
-            position: "absolute",
-            bottom: 0,
-            right: 0,
-            left: 0,
-            display: "flex",
-            justifyContent: "flex-end",
-            pointerEvents: "none",
-          }}
+          ref={containerRef}
+          sx={{ display: "flex", gap: 3, position: "relative" }}
         >
+          {tabs.map((tab, i) => (
+            <Button
+              key={tab.path}
+              ref={(el) => (tabRefs.current[i] = el)}
+              component={Link}
+              to={tab.path}
+              disableRipple
+              sx={{
+                position: "relative",
+                fontWeight: currentTab === i ? 700 : 500,
+                fontSize: { xs: "0.9rem", sm: "1rem" },
+                color: currentTab === i ? HIGHLIGHT : "#000",
+                textTransform: "none",
+                "&:hover": {
+                  backgroundColor: "transparent",
+                  color: HIGHLIGHT,
+                  transform: "translateY(-1px)",
+                },
+                transition: "all 0.2s ease-in-out",
+              }}
+            >
+              {tab.label}
+            </Button>
+          ))}
+
+          {/* Animated underline */}
           <motion.div
-            layoutId="tab-indicator"
-            style={{
-              height: "3px",
-              backgroundColor: "#000",
-              borderRadius: "2px",
+            animate={{
+              left: indicator.left,
+              width: indicator.width,
             }}
             transition={{
               type: "spring",
-              stiffness: 500,
+              stiffness: 400,
               damping: 30,
+            }}
+            style={{
+              position: "absolute",
+              bottom: 0,
+              height: "3px",
+              borderRadius: "2px",
+              background: HIGHLIGHT,
             }}
           />
         </Box>
