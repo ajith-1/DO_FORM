@@ -32,7 +32,7 @@ export default function Navbar() {
     }
   }, [currentTab, location.pathname]);
 
-  const HIGHLIGHT = "#AD241B";
+  const HIGHLIGHT = "#0335fc";
 
   return (
     <AppBar

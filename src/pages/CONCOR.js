@@ -33,7 +33,7 @@ const theme = createTheme({
 export default function CONCOR() {
   const [form, setForm] = useState({
     importerName: "",
-    importerGST: "",
+    importerGST: "29APHPS4682L1Z0",
     chaName: "SREE EXIM SOLUTIONS",
     boeNo: "",
     boeDate: "",
@@ -48,8 +48,8 @@ export default function CONCOR() {
     deliveryType: "",
     vehicle: "",
     equipment: "",
-    accountNo: "123456789",
-    acName:"SREE EXIM SOLUTIONS"
+    accountNo: "WFD-C110401-1",
+    acName: "SREE EXIM SOLUTIONS"
   });
 
   const [openToast, setOpenToast] = useState(false);
@@ -70,7 +70,7 @@ export default function CONCOR() {
     setIsDownloading(true);
     try {
       const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-  
+
       // ---- Logo ----
       try {
         if (logoBase64) {
@@ -79,84 +79,92 @@ export default function CONCOR() {
       } catch (err) {
         console.warn("Logo not added:", err);
       }
-  
+
       // ---- Header ----
       doc.setFont("times", "normal");
       doc.setFontSize(12);
       doc.text("FORM No. WFD / F / 040", 200, 15, { align: "right" });
-  
+
       doc.setFont("times", "bold");
       doc.setFontSize(16);
       doc.text("CONTAINER CORPORATION OF INDIA LTD.", 105, 22, { align: "center" });
-  
+
       doc.setFont("times", "normal");
       doc.setFontSize(12);
       doc.text("INLAND CONTAINER DEPOT,", 105, 29, { align: "center" });
       doc.text("WHITEFIELD, BANGALORE - 560 066", 105, 35, { align: "center" });
-  
+
       doc.setFont("times", "bold");
       doc.setFontSize(13);
       doc.text("IMPORT APPLICATION", 105, 43, { align: "center" });
-  
+
       // ---- Date (top right) ----
       doc.setFont("times", "normal");
       doc.setFontSize(12);
       doc.text("Date :", 160, 50); // label
       doc.text(formatDate(form.importAppDate) || "", 180, 50); // value
-  
+
       // ---- Body ----
       let y = 65;
       const lineGap = 8;
       const labelX = 15;
       const colonX = 85;
       const valueX = 95;
-  
+
       // helper to add rows
       const addRow = (label, value = "", showColon = true) => {
         doc.text(label, labelX, y);
-  
+
         if (showColon) {
           doc.text(":", colonX, y);
           doc.text(value || "", valueX, y);
         } else if (value) {
-          // if a value exists but colon is hidden → print value at colonX
+          
           doc.text(value, colonX, y);
         }
         y += lineGap;
       };
-  
+
       // ---- Rows ----
       addRow("1. a) NAME OF THE IMPORTER", form.importerName);
-      addRow("   b) GST No. (Invoice Purpose)", form.importerGST);
+      addRow("   b) Name & GST No. Details for", form.importerGST);
+      addRow("      which invoice to be generated", "", false);
       addRow("2. NAME OF CHA", form.chaName);
       addRow("3. BILL OF ENTRY NO. & DATE", `${form.boeNo || ""}   ${formatDate(form.boeDate)}`);
       addRow("4. SHIPPING LINE", form.shippingLine);
       addRow("5. CONTAINER NO.", form.containerNo);
       addRow("6. CARGO DETAILS", form.cargoType);
-      addRow("   (Hazardous / Non-Hazardous)", "", false);
+      addRow("    (HAZARDOUS / NON-HAZARDOUS)", "", false);
       addRow("7. WEIGHT", `${form.weight || ""} KGS`);
       addRow("8. NO. OF PKGS", `${form.packages || ""} PKG`);
       addRow("9. LCL / FCL", form.lclFcl);
       addRow("10. TYPE OF DELIVERY", form.deliveryType);
-      addRow("    (WH / DIRECT / OUTSIDE)", "", false);
-      addRow("11. VEHICLE", form.vehicle);
-      addRow("    (LORRY / TEMPO / TRAILER)", "", false);
-      addRow("12. EQUIPMENT REQUIRED", form.equipment);
-      addRow("    (Fork / Crane / Manual)", "", false);
-      addRow("13. PAYMENT MODE", form.accountNo);
-      addRow("    (Cash / DD / PDA A/c)", "", false);
+      addRow("     (WH / DIRECT / OUTSIDE)", "", false);
+      // addRow("11. VEHICLE (LORRY / TEMPO / TRAILER)", form.vehicle);
+      doc.setFont("times", "normal")
+      doc.setFontSize(12)
+      doc.text(`11. VEHICLE (LORRY / TEMPO / TRAILER) : ${form.vehicle || ""}`, 15, y)
+      y+=lineGap
 
-      doc.setFont("times", "bold");
-doc.setFontSize(12);
-doc.text("CODE", 20, y, { align: "left" });
-doc.text(`OF M/S. ${form.acName || ""}`, 80, y);
-  
+      addRow("12. DETAILS OF EQUIPMENT", form.equipment);
+      addRow("    REQUIRED (FORK / CRANE / MANUAL / KALMAR)", "", false);
+
+      doc.setFont("times", "normal")
+      doc.setFontSize(12)
+      doc.text(`13.THE CHARGES FOR ABOVE ACTIVITY PAID BY CASH / DD / PDA A/c. ${form.accountNo || ""}`, 15, y)
+      y+=lineGap*2
+
+      doc.setFont("times", "normal");
+      doc.setFontSize(12);
+      doc.text("CODE", 20, y, { align: "left" });
+      doc.text(`OF M/S. ${form.acName || ""}`, 70, y);
+
       // ---- Footer ----
       y += lineGap * 2;
-      doc.text("for", 190, y, { align: "right" });
-      y += lineGap * 2;
+      doc.text("for", 170, y, { align: "right" });
+      y += lineGap * 3;
       doc.text("Signature of the Applicant", 190, y, { align: "right" });
-  
+
       // Save PDF
       doc.save("Concor_Import_Application.pdf");
       setOpenToast(true);
@@ -167,14 +175,14 @@ doc.text(`OF M/S. ${form.acName || ""}`, 80, y);
       setIsDownloading(false);
     }
   };
-  
+
 
   const cargoOptions = ["HAZARDOUS", "NON-HAZARDOUS"];
   const lclFclOptions = ["LCL", "FCL"];
-  const deliveryOptions = ["ICD DESTUFF", "FACTORY DESTUFF",];
+  const deliveryOptions = ["ICD DESTUFF", "FACTORY DESTUFF", "5%"];
   const vehicleOptions = ["LORRY", "TEMPO", "TRAILER"];
   const equipmentOptions = ["FORK", "CRANE", "MANUAL", "KALMAR"];
- 
+
 
   return (
     <ThemeProvider theme={theme}>
@@ -244,27 +252,27 @@ doc.text(`OF M/S. ${form.acName || ""}`, 80, y);
                 </TextField>
               </Grid>
               <Grid item xs={12}>
-  <TextField
-    sx={{ minWidth: 250 }}
-    label="Account no"
-    name="accountNo"
-    value={form.accountNo}
-    onChange={handleChange}
-    fullWidth
-    required
-  />
-</Grid>
-<Grid item xs={12}>
-  <TextField
-    sx={{ minWidth: 250 }}
-    label="Account Holder"
-    name="acName"
-    value={form.acName}
-    onChange={handleChange}
-    fullWidth
-    required
-  />
-</Grid>
+                <TextField
+                  sx={{ minWidth: 250 }}
+                  label="Account no"
+                  name="accountNo"
+                  value={form.accountNo}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  sx={{ minWidth: 250 }}
+                  label="Account Holder"
+                  name="acName"
+                  value={form.acName}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                />
+              </Grid>
             </Grid>
           </Paper>
 
