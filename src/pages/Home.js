@@ -5,7 +5,6 @@ import {
   CssBaseline,
   ThemeProvider,
   createTheme,
-  Button,
   Container,
 } from "@mui/material";
 import { motion } from "framer-motion";
@@ -29,7 +28,7 @@ export default function Home() {
           display: "flex",
           alignItems: "center",
           backgroundColor: "#fff",
-          backgroundImage: "url('/world-map.png')", // world map background
+          backgroundImage: "url('/world-map.png')",
           backgroundRepeat: "no-repeat",
           backgroundSize: "contain",
           backgroundPosition: "center",
@@ -75,7 +74,6 @@ export default function Home() {
               </Typography>
             </motion.div>
 
-            {/* Button */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -94,7 +92,7 @@ export default function Home() {
             }}
           >
             <motion.img
-              src="/packages.png" // replace with your packages image
+              src="/packages.png" 
               alt="Packages"
               style={{
                 width: "100%",

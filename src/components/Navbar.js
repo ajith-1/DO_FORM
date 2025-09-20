@@ -14,7 +14,7 @@ export default function Navbar() {
   // Active tab index
   const currentTab = tabs.findIndex((t) => t.path === location.pathname) ?? 0;
 
-  // Refs for measuring underline position
+
   const containerRef = useRef(null);
   const tabRefs = useRef([]);
   const [indicator, setIndicator] = useState({ left: 0, width: 0 });
@@ -53,7 +53,7 @@ export default function Navbar() {
           px: { xs: 2, sm: 4 },
         }}
       >
-        {/* Brand */}
+        {/* NAME */}
         <Typography
           variant="h6"
           sx={{
