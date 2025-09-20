@@ -8,7 +8,7 @@ import {
   Typography,
   Paper,
   MenuItem,
-  Divider,
+  Autocomplete,
   Snackbar,
   Alert,
   CssBaseline,
@@ -19,7 +19,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import jsPDF from "jspdf";
 
-import logoBase64 from "../components/Img"; // <-- put your base64 logo here
+import logoBase64 from "../components/Img";
 
 const theme = createTheme({
   palette: {
@@ -101,8 +101,7 @@ export default function CONCOR() {
       // ---- Date (top right) ----
       doc.setFont("times", "normal");
       doc.setFontSize(12);
-      doc.text("Date :", 160, 50); // label
-      doc.text(formatDate(form.importAppDate) || "", 180, 50); // value
+      doc.text(`Date : ${formatDate(form.importAppDate) || ""}`, 160, 50);
 
       // ---- Body ----
       let y = 65;
@@ -111,7 +110,7 @@ export default function CONCOR() {
       const colonX = 85;
       const valueX = 95;
 
-      // helper to add rows
+      // add rows
       const addRow = (label, value = "", showColon = true) => {
         doc.text(label, labelX, y);
 
@@ -119,7 +118,7 @@ export default function CONCOR() {
           doc.text(":", colonX, y);
           doc.text(value || "", valueX, y);
         } else if (value) {
-          
+
           doc.text(value, colonX, y);
         }
         y += lineGap;
@@ -130,29 +129,28 @@ export default function CONCOR() {
       addRow("   b) Name & GST No. Details for", form.importerGST);
       addRow("      which invoice to be generated", "", false);
       addRow("2. NAME OF CHA", form.chaName);
-      addRow("3. BILL OF ENTRY NO. & DATE", `${form.boeNo || ""}   ${formatDate(form.boeDate)}`);
+      addRow("3. BILL OF ENTRY NO. & DATE", `${form.boeNo || ""} ${formatDate(form.boeDate)}`);
       addRow("4. SHIPPING LINE", form.shippingLine);
       addRow("5. CONTAINER NO.", form.containerNo);
       addRow("6. CARGO DETAILS", form.cargoType);
       addRow("    (HAZARDOUS / NON-HAZARDOUS)", "", false);
       addRow("7. WEIGHT", `${form.weight || ""} KGS`);
-      addRow("8. NO. OF PKGS", `${form.packages || ""} PKG`);
+      addRow("8. NO. OF PKGS", `${form.packages || ""} ${form.packageType || ""}`);
       addRow("9. LCL / FCL", form.lclFcl);
       addRow("10. TYPE OF DELIVERY", form.deliveryType);
       addRow("     (WH / DIRECT / OUTSIDE)", "", false);
-      // addRow("11. VEHICLE (LORRY / TEMPO / TRAILER)", form.vehicle);
       doc.setFont("times", "normal")
       doc.setFontSize(12)
       doc.text(`11. VEHICLE (LORRY / TEMPO / TRAILER) : ${form.vehicle || ""}`, 15, y)
-      y+=lineGap
+      y += lineGap
 
       addRow("12. DETAILS OF EQUIPMENT", form.equipment);
-      addRow("    REQUIRED (FORK / CRANE / MANUAL / KALMAR)", "", false);
+      addRow("    REQUIRED (FORK / CRANE / MANUAL)", "", false);
 
       doc.setFont("times", "normal")
       doc.setFontSize(12)
       doc.text(`13.THE CHARGES FOR ABOVE ACTIVITY PAID BY CASH / DD / PDA A/c. ${form.accountNo || ""}`, 15, y)
-      y+=lineGap*2
+      y += lineGap * 2
 
       doc.setFont("times", "normal");
       doc.setFontSize(12);
@@ -182,6 +180,9 @@ export default function CONCOR() {
   const deliveryOptions = ["ICD DESTUFF", "FACTORY DESTUFF", "5%"];
   const vehicleOptions = ["LORRY", "TEMPO", "TRAILER"];
   const equipmentOptions = ["FORK", "CRANE", "MANUAL", "KALMAR"];
+  const packageTypes = [
+    "BDL", "BGS", "BLK", "BLS", "BOX", "BRL", "BUL", "CAN", "CAS", "CHT", "CLS", "COL", "CRT", "CSK", "CTN", "CYL", "DRM", "EVN", "FLK", "FUT", "HBK", "JBL", "JTA", "KEG", "LFT", "LOG", "NGT", "PAL", "PCS", "PKG", "PLT", "QDS", "REL", "RLS", "SHT", "SKD", "SLB", "TSL", "TIN", "TRK", "UNT"
+  ];
 
 
   return (
@@ -230,6 +231,15 @@ export default function CONCOR() {
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField sx={{ minWidth: 250 }} label="No. of Packages" name="packages" value={form.packages} onChange={handleChange} fullWidth required />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Autocomplete
+                  freeSolo
+                  options={packageTypes}
+                  inputValue={form.packageType}
+                  onInputChange={(_, newValue) => setForm((p) => ({ ...p, packageType: (newValue || "").toUpperCase() }))}
+                  renderInput={(params) => <TextField sx={{ minWidth: 250 }} {...params} label="Package Type" fullWidth required />}
+                />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField sx={{ minWidth: 250 }} select label="LCL / FCL" name="lclFcl" value={form.lclFcl} onChange={handleChange} fullWidth required>

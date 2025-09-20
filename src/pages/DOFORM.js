@@ -60,12 +60,24 @@ export default function DOFORM() {
   const MotionButton = motion(Button);
   const [openToast, setOpenToast] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [containerCountInput, setContainerCountInput] = useState("1"); // string for raw input
+  const [containerCountInput, setContainerCountInput] = useState("1");
+
+  // INPUT OPTIONS ADDRESS, CONTAINER TYPE, PKG TYPE
+  const addressOptions = [
+    "INLAND CONTAINER DEPOT (ICD)\nWHITE FIELD BANGALORE",
+    "PEARL CONTAINER TERMINALS,\nNO.53, SIPCOT INDUSTRIAL COMPLEX,\nPHASE-I, HOSUR – 635126",
+    "ENNORE CARGO CONTAINER TERMINAL PVT LTD,\nCHENNAI",
+  ];
+
+  const containerTypes = ["20", "40", "20HC", "40HC", "20GP", "40GP"];
+  const packageTypes = [
+    "BDL", "BGS", "BLK", "BLS", "BOX", "BRL", "BUL", "CAN", "CAS", "CHT", "CLS", "COL", "CRT", "CSK", "CTN", "CYL", "DRM", "EVN", "FLK", "FUT", "HBK", "JBL", "JTA", "KEG", "LFT", "LOG", "NGT", "PAL", "PCS", "PKG", "PLT", "QDS", "REL", "RLS", "SHT", "SKD", "SLB", "TSL", "TIN", "TRK", "UNT"
+  ];
 
   // When "No. of Container" is changed
   const handleContainerCountChange = (e) => {
     const value = e.target.value;
-    setContainerCountInput(value); // let the user type freely
+    setContainerCountInput(value);
 
     const count = parseInt(value, 10);
 
@@ -177,7 +189,7 @@ export default function DOFORM() {
       doc.setFontSize(16);
       doc.text("DELIVERY ORDER", 105, 45, { align: "center" });
 
-      // ---- Address & intro ----
+      // ---- Address ----
       doc.setFont("helvetica", "normal");
       doc.setFontSize(12);
       doc.text("To,", 10, 55);
@@ -223,13 +235,13 @@ export default function DOFORM() {
         styles: {
           font: "helvetica",
           fontSize: 12,
-          cellPadding: 2, // uniform padding for even vertical centering
+          cellPadding: 2,
           lineWidth: 0,
           valign: "middle", // vertical center
         },
         bodyStyles: {
           textColor: 0,
-          minCellHeight: 8, // ensures all rows have enough height to center text
+          minCellHeight: 8,
           valign: "middle", // vertical center
         },
         columnStyles: {
@@ -285,16 +297,6 @@ export default function DOFORM() {
     }
   };
 
-  const addressOptions = [
-    "INLAND CONTAINER DEPOT (ICD)\nWHITE FIELD BANGALORE",
-    "PEARL CONTAINER TERMINALS,\nNO.53, SIPCOT INDUSTRIAL COMPLEX,\nPHASE-I, HOSUR – 635126",
-    "ENNORE CARGO CONTAINER TERMINAL PVT LTD,\nCHENNAI",
-  ];
-
-  const containerTypes = ["20", "40", "20HC", "40HC","20GP", "40GP"];
-  const packageTypes = [
-    "BDL", "BGS", "BLK", "BLS", "BOX", "BRL", "BUL", "CAN", "CAS", "CHT", "CLS", "COL", "CRT", "CSK", "CTN", "CYL", "DRM", "EVN", "FLK", "FUT", "HBK", "JBL", "JTA", "KEG", "LFT", "LOG", "NGT", "PAL", "PCS", "PKG", "PLT", "QDS", "REL", "RLS", "SHT", "SKD", "SLB", "TSL", "TIN", "TRK", "UNT"
-  ];
 
   return (
     <ThemeProvider theme={theme}>
@@ -330,7 +332,7 @@ export default function DOFORM() {
                 <TextField sx={{ minWidth: 250 }} type="date" label="DO Date" name="doDate" value={form.doDate} onChange={handleChange} fullWidth InputLabelProps={{ shrink: true }} required />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField sx={{ minWidth: 250 }} label="HBL No" name="blNo" value={form.blNo} onChange={handleChange} fullWidth required />
+                <TextField sx={{ minWidth: 250 }} label="House BL No" name="blNo" value={form.blNo} onChange={handleChange} fullWidth required />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField sx={{ minWidth: 250 }} type="date" label="BL Date" name="blDate" value={form.blDate} onChange={handleChange} fullWidth InputLabelProps={{ shrink: true }} required />
