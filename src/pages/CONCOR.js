@@ -27,7 +27,7 @@ const theme = createTheme({
     primary: { main: "#1976d2" },
     background: { default: "#f5f5f5" },
   },
-  typography: { fontFamily: "'Segoe UI', sans-serif" },
+  typography: { fontFamily: "'Poppins', sans-serif" },
 });
 
 export default function CONCOR() {

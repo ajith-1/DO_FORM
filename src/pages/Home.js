@@ -16,7 +16,7 @@ const theme = createTheme({
     primary: { main: "#1976d2" },
     background: { default: "#ffffff" },
   },
-  typography: { fontFamily: "'Segoe UI', sans-serif" },
+  typography: { fontFamily: "'Poppins', sans-serif" },
 });
 
 export default function Home() {

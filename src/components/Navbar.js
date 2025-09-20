@@ -42,6 +42,7 @@ export default function Navbar() {
         backgroundColor: "#fff",
         color: "#000",
         borderBottom: "1px solid #e0e0e0",
+        fontFamily:"Poppins",
       }}
     >
       <Toolbar
